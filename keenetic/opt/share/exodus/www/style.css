@@ -236,6 +236,11 @@ button, input, select, textarea {
     flex-shrink: 0;
 }
 
+/* the buttons of the current page, only the dashboard has them */
+#page-actions:empty {
+    display: none;
+}
+
 @media (max-width: 767px) {
     .header-inner {
         flex-wrap: wrap;
@@ -2156,33 +2161,6 @@ body[data-page="dashboard"] main.container {
     min-height: 0;
 }
 
-.dashboard-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    height: 40px;
-    padding: 0 16px 0 24px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-}
-
-.dashboard-name {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    color: var(--muted-foreground);
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.dashboard-name svg {
-    width: 15px;
-    height: 15px;
-    flex-shrink: 0;
-}
-
 .dashboard-frame {
     display: block;
     flex: 1;
@@ -2199,10 +2177,4 @@ body[data-page="dashboard"] main.container {
     max-width: 560px;
     margin: 48px auto;
     padding: 0 16px;
-}
-
-@media (max-width: 767px) {
-    .dashboard-bar {
-        padding: 0 8px 0 16px;
-    }
 }

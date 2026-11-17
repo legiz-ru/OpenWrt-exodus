@@ -115,6 +115,15 @@ file_list() {
 	done | jq -R -s 'split("\n") | map(select(length > 0) | split("\t") | {name: .[0], size: (.[1] | tonumber)}) | sort_by(.name)'
 }
 
+# the colors of exodus for miboard (the theme= of the dashboard link) lie next to the panel, on the origin of the core
+# the core removes the folder when it downloads the panel again, the status every few seconds brings the file back
+dashboard_theme() {
+	dashboard_paths
+	[ -f "$d_dir/index.html" ] || return 0
+	[ "$(cat "$SHARE_DIR/miboard-theme.css" 2> /dev/null)" = "$(cat "$d_dir/exodus-theme.css" 2> /dev/null)" ] && return 0
+	cp -f "$SHARE_DIR/miboard-theme.css" "$d_dir/exodus-theme.css" 2> /dev/null
+}
+
 action_status() {
 	local running started api
 	running=false
@@ -123,6 +132,7 @@ action_status() {
 	[ -f "$STARTED_FLAG_PATH" ] && started=true
 	api=$(cat "$API_JSON_PATH" 2> /dev/null)
 	[ -n "$api" ] || api='{}'
+	dashboard_theme
 	jq -n \
 		--argjson running "$running" \
 		--argjson started "$started" \
@@ -685,6 +695,7 @@ action_update_dashboard() {
 		https://github.com/*/*/releases/latest/download/*) [ -n "$version" ] || version=$(latest_tag "$d_url") ;;
 	esac
 	printf '%s\n%s\n' "$d_url" "$version" > "$d_mark"
+	dashboard_theme
 	echo '{"success": true}' | ok
 }
 
