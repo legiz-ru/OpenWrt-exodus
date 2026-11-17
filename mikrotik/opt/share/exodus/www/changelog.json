@@ -5,6 +5,16 @@
   },
   "releases": [
     {
+      "version": "1.30.6",
+      "date": "2026-11-17",
+      "en": [
+        "Prizrak-Core is the core of new installs and of the container image. A router that runs another core keeps it in its settings: after pulling the new image the Updates page offers to install it again."
+      ],
+      "ru": [
+        "Prizrak-Core — ядро новых установок и образа контейнера. Роутер с другим ядром сохраняет его в настройках: после загрузки нового образа страница «Обновления» предложит установить его снова."
+      ]
+    },
+    {
       "version": "1.30.5",
       "date": "2026-11-17",
       "en": [

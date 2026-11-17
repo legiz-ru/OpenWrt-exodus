@@ -4,7 +4,7 @@
 
 FROM alpine:3.22
 
-ARG CORE=meta
+ARG CORE=prizrak
 ARG GH_PROXY=
 ARG COMMIT=
 
