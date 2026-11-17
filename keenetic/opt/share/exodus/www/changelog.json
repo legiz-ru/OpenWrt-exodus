@@ -5,6 +5,16 @@
   },
   "releases": [
     {
+      "version": "1.30.6",
+      "date": "2026-11-17",
+      "en": [
+        "Prizrak-Core is the core of new installs. Installed routers keep their core, it is changed on the Updates page or by running the installer again."
+      ],
+      "ru": [
+        "Prizrak-Core — ядро новых установок. Установленные роутеры сохраняют своё ядро, его можно сменить на странице «Обновления» или повторным запуском установщика."
+      ]
+    },
+    {
       "version": "1.30.5",
       "date": "2026-11-17",
       "en": [
