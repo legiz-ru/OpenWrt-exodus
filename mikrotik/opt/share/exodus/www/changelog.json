@@ -5,6 +5,22 @@
   },
   "releases": [
     {
+      "version": "1.30.5",
+      "date": "2026-11-17",
+      "en": [
+        "MIBoard opens in the colors of Exodus: the web UI puts its theme next to the panel and passes it in the link. Custom CSS set in MIBoard still wins.",
+        "MIBoard and Zashboard hide their core update and the TUN switch: Exodus updates the core, and the container takes the traffic with tproxy, without TUN. The saved server is named Exodus.",
+        "The Dashboard tab has no bar over the panel: its Update and Open in a new tab buttons are in the header.",
+        "Before the start Exodus checks that the ports of the core are free. When another panel or package still holds one, the log names the port and the process, and the start stops instead of running the core without that port."
+      ],
+      "ru": [
+        "MIBoard открывается в цветах Exodus: веб-интерфейс кладёт тему рядом с панелью и передаёт её в ссылке. Собственный CSS, заданный в MIBoard, по-прежнему важнее.",
+        "MIBoard и Zashboard скрывают обновление ядра и переключатель TUN: ядро обновляет Exodus, а контейнер принимает трафик через tproxy, без TUN. Сохранённый сервер называется Exodus.",
+        "У вкладки «Панель» больше нет полосы над панелью: кнопки «Обновить» и «Открыть в новой вкладке» перенесены в шапку.",
+        "Перед запуском Exodus проверяет, свободны ли порты ядра. Если порт ещё занят другой панелью или пакетом, в журнале будут порт и процесс, а запуск остановится, вместо того чтобы ядро работало без этого порта."
+      ]
+    },
+    {
       "version": "1.30.4",
       "date": "2026-11-10",
       "en": [

@@ -886,6 +886,8 @@ function runningSubscriptionState() {
 
 // the panel is served by the core on its api port, null while the core is not running
 // global-mode: false of the provider hides the mode switch of miboard (hideMode), the other panels ignore it
+// exodus updates the core and keenetic has no tun, so miboard and zashboard hide those switches
+// theme: the colors of exodus, api.cgi copies miboard-theme.css next to the panel, miboard takes plain http only from its own origin
 function dashboardUrl() {
     const status = state.status || {};
     const info = status.api || {};
@@ -896,15 +898,19 @@ function dashboardUrl() {
     const protocol = info.tls_listen ? 'https' : 'http';
     const port = listen.substring(listen.lastIndexOf(':') + 1);
     const host = window.location.hostname;
-    const params = { host: host, hostname: host, port: port, secret: info.secret || '' };
+    const path = info.ui_name ? `/ui/${info.ui_name}/` : '/ui/';
+    const origin = `${protocol}://${host.includes(':') && !host.startsWith('[') ? `[${host}]` : host}:${port}`;
+    const params = {
+        host: host, hostname: host, port: port, secret: info.secret || '', label: 'Exodus',
+        disableUpgradeCore: '1', disableTunMode: '1', theme: `${origin}${path}exodus-theme.css`
+    };
     if ((runningSubscriptionState() || {}).global_mode === false) {
         params.hideMode = '1';
     }
     const query = new URLSearchParams(params).toString();
-    const path = info.ui_name ? `/ui/${info.ui_name}/` : '/ui/';
     // zashboard and metacubexd keep the backends they know and take a new secret of the link only on their setup page, yacd reads the query
     const setup = /yacd/i.test(info.ui_url || '') ? '' : `#/setup?${query}`;
-    return `${protocol}://${host.includes(':') && !host.startsWith('[') ? `[${host}]` : host}:${port}${path}?${query}${setup}`;
+    return `${origin}${path}?${query}${setup}`;
 }
 
 function openDashboard() {
@@ -941,14 +947,12 @@ function pageDashboard() {
         }
         return E('iframe', { class: 'dashboard-frame', src: url, title: dashboardTitle(), allow: 'clipboard-read; clipboard-write; fullscreen', referrerpolicy: 'no-referrer' });
     }, () => [dashboardUrl(), !!(state.status && state.status.running)]);
-    const bar = E('div', { class: 'dashboard-bar' }, [
-        E('div', { class: 'dashboard-name' }, [icon('dashboard'), live(() => dashboardTitle(), () => dashboardTitle())]),
-        E('div', { class: 'row' }, [
-            btn(null, { variant: 'ghost', size: 'sm', icon: 'download', title: _('Update the dashboard'), onClick: updateDashboard }),
-            btn(null, { variant: 'ghost', size: 'sm', icon: 'external-link', title: _('Open in a new tab'), onClick: openDashboard })
-        ])
+    // the buttons of the panel sit in the header, render() clears them on the other pages
+    append(document.getElementById('page-actions'), [
+        btn(null, { variant: 'ghost', size: 'sm', icon: 'download', title: _('Update the dashboard'), onClick: updateDashboard }),
+        btn(null, { variant: 'ghost', size: 'sm', icon: 'external-link', title: _('Open in a new tab'), onClick: openDashboard })
     ]);
-    return E('div', { class: 'dashboard' }, [bar, view]);
+    return E('div', { class: 'dashboard' }, view);
 }
 
 // the expire date of the provider: 0 and dates from 2099 on mean no expiry, a state of an older version has the date as text
@@ -2575,6 +2579,7 @@ async function render() {
     liveViews = [];
     const content = clear(document.getElementById('content'));
     content.appendChild(loader());
+    clear(document.getElementById('page-actions'));
     renderMenu();
     const page = currentPage();
     // the dashboard takes the whole width and height under the header
@@ -2644,6 +2649,7 @@ function showLogin() {
     renderAboutButton();
     document.getElementById('logout').hidden = true;
     document.getElementById('menu').hidden = true;
+    clear(document.getElementById('page-actions'));
     document.getElementById('savebar').hidden = true;
     const password = E('input', { class: 'input', type: 'password', autocomplete: 'current-password' });
     const form = E('form', { class: 'card' }, [
