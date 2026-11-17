@@ -247,11 +247,14 @@ return baseclass.extend({
         }
 
         const host = window.location.hostname;
+        // the update page of exodus updates the core, so miboard and zashboard hide their own core update; tun is a mode of the mixin here and stays
         const params = {
             host: host,
             hostname: host,
             port: port,
-            secret: apiSecret
+            secret: apiSecret,
+            label: 'Exodus',
+            disableUpgradeCore: '1'
         };
         await uci.load('nikki');
         const profileName = uci.get('nikki', 'config', 'profile') ?? '';

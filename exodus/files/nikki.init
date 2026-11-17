@@ -207,6 +207,11 @@ start_service() {
 			fi
 		fi
 	fi
+	# the dashboard needs the api: a profile without one (no api listen in the mixin, or core only) gets the default
+	if yq -M -e '(.external-controller // "") == "" and (.external-controller-tls // "") == ""' "$RUN_PROFILE_PATH" > /dev/null 2>&1; then
+		log "Profile" "The profile has no API, it listens on [::]:9090."
+		yq -M -i '.external-controller = "[::]:9090"' "$RUN_PROFILE_PATH"
+	fi
 	# check profile
 	if [ "$core_only" = 0 ] && [ "$proxy_enabled" = 1 ]; then
 		log "Profile" "Checking..."
@@ -263,6 +268,34 @@ start_service() {
 			log "App" "Exit."
 			return
 		fi
+	fi
+	# the ports the core is about to listen must be free: a core of another panel or package left running holds them
+	# mihomo does not exit on a busy port, it runs without that listener; the core of exodus itself is still running on a reload
+	local port_entry port_proto port_value port_inode port_pid port_owner port_busy
+	port_busy=0
+	for port_entry in $( {
+		yq -M '[.mixed-port, .port, .socks-port, .redir-port, .tproxy-port, .external-controller, .external-controller-tls] + [(.listeners // [])[] | .port] | .[] | select(. != null)' "$RUN_PROFILE_PATH" 2> /dev/null | sed 's/^/tcp:/'
+		yq -M 'select(.dns.enable == true) | .dns.listen // ""' "$RUN_PROFILE_PATH" 2> /dev/null | sed 's/^/udp:/; p; s/^udp:/tcp:/'
+	} | tr -d "'\"" | sed 's/^\(...\):.*:/\1:/' | sort -u); do
+		port_proto="${port_entry%%:*}"
+		port_value="${port_entry#*:}"
+		case "$port_value" in
+			""|0|*[!0-9]*) continue ;;
+		esac
+		port_inode=$(port_socket "$port_proto" "$port_value") || continue
+		port_pid=$(socket_pid "$port_inode")
+		if [ -n "$port_pid" ] && tr '\0' ' ' < "/proc/$port_pid/cmdline" 2> /dev/null | grep -q -F -e "-d $RUN_DIR"; then
+			continue
+		fi
+		port_owner="another process"
+		[ -n "$port_pid" ] && port_owner="$(cat "/proc/$port_pid/comm" 2> /dev/null) (pid $port_pid)"
+		log "Profile" "Port $port_value/$port_proto is already used by $port_owner."
+		port_busy=1
+	done
+	if [ "$port_busy" = 1 ]; then
+		log "Profile" "Another panel or package may still be running: stop it or change the ports."
+		log "App" "Exit."
+		return
 	fi
 	# the core downloads the panel only when its folder is missing: when another panel is chosen, the folder of the old one is removed
 	# and the core downloads the chosen one; the address of the downloaded panel is kept next to its folder

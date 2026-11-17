@@ -85,6 +85,22 @@ log() {
 	echo "[$(date "+%Y-%m-%d %H:%M:%S")] [$1] $2" >> "$APP_LOG_PATH"
 }
 
+# a socket of the port is listened: tcp in the listen state (0A), udp unconnected (07); prints the inode of the socket
+port_socket() {
+	local hex state
+	hex=$(printf '%04X' "$2")
+	state=07
+	[ "$1" = tcp ] && state=0A
+	cat "/proc/net/$1" "/proc/net/${1}6" 2> /dev/null | awk -v port=":$hex" -v state="$state" '$2 ~ port"$" && $4 == state { print $10; found = 1; exit } END { exit !found }'
+}
+
+# the pid of the process that holds the socket $1, looked up in the open files of the processes
+socket_pid() {
+	# one ls reads the targets of all the open files, a readlink for each would fork thousands of times
+	# shellcheck disable=SC2012
+	ls -l /proc/[0-9]*/fd 2> /dev/null | awk -v sock="socket:[$1]" '/^\/proc\// { pid = $0; sub(/^\/proc\//, "", pid); sub(/\/fd:$/, "", pid); next } $NF == sock { print pid; exit }'
+}
+
 get_package_version() {
 	# print the installed version of package $1 without the release suffix
 	local version
