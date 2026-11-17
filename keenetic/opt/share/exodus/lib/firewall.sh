@@ -10,7 +10,8 @@
 # nat PREROUTING  -> EXODUS_PRE: dns of lan clients to the core, tcp to the redirect port
 #                    it is inserted first, before the dns redirects of ndm (internet filter, dns profiles),
 #                    so the core resolves regardless of the dns settings of the router
-# mangle PREROUTING -> EXODUS_MANGLE: udp (and tcp in tproxy mode) to the tproxy port
+# mangle PREROUTING -> EXODUS_MANGLE: udp (and tcp in tproxy mode) to the tproxy port,
+#                    tcp of established proxied connections goes through EXODUS_DIVERT first
 # filter INPUT    -> EXODUS_INPUT: accept redirected traffic, guest segments drop it otherwise
 # nat/mangle OUTPUT -> router proxy, off by default
 #
@@ -27,7 +28,7 @@ SET_LOCAL6="exodus_local6"
 SET_DENY="exodus_deny"
 
 FW_CHAINS_NAT="EXODUS_PRE EXODUS_LAN EXODUS_DNS EXODUS_DNS_DO EXODUS_REDIR EXODUS_REDIR_PORTS EXODUS_REDIR_AC EXODUS_REDIR_DO EXODUS_OUT EXODUS_OUT_PORTS"
-FW_CHAINS_MANGLE="EXODUS_MANGLE EXODUS_TP EXODUS_TP_PORTS EXODUS_TP_AC EXODUS_TP_DO EXODUS_MOUT EXODUS_MOUT_PORTS EXODUS_MOUT_DO"
+FW_CHAINS_MANGLE="EXODUS_MANGLE EXODUS_DIVERT EXODUS_TPEXODUS_TP_PORTS EXODUS_TP_AC EXODUS_TP_DO EXODUS_MOUT EXODUS_MOUT_PORTS EXODUS_MOUT_DO"
 FW_CHAINS_FILTER="EXODUS_INPUT"
 
 # split "80 443 1000-2000" into iptables multiport chunks of at most 15 ports, a range counts twice
@@ -64,6 +65,15 @@ fw_load_modules() {
 
 fw_has_target() {
 	grep -q "^$1$" /proc/net/ip_tables_targets 2> /dev/null
+}
+
+# tcp in tproxy mode and the socket match of the family is there, otherwise the whole table would fail to restore
+fw_divert() {
+	local file
+	case " $fw_tp_protos " in *" tcp "*) ;; *) return 1 ;; esac
+	file=/proc/net/ip_tables_matches
+	[ "$1" = 6 ] && file=/proc/net/ip6_tables_matches
+	grep -q "^socket$" "$file" 2> /dev/null
 }
 
 # global ipv6 addresses exist, otherwise the clients have no ipv6 internet and ipv6 rules are skipped
@@ -460,6 +470,13 @@ fw_build() {
 			fi
 			if [ "$fw_lan" = 1 ]; then
 				[ "$fw_parental" = 1 ] && [ "$fw_mac_set" = 1 ] && echo "-A EXODUS_MANGLE -m set --match-set $SET_DENY src -j RETURN"
+				# tcp of a connection the core already holds skips the whole chain, like the divert of xkeen
+				# udp stays on the full path: the sockets the core replies from would match too
+				if fw_divert "$family"; then
+					echo "-A EXODUS_MANGLE -p tcp -m socket --transparent -j EXODUS_DIVERT"
+					echo "-A EXODUS_DIVERT -j MARK --set-xmark $fw_mark/$fw_mask"
+					echo "-A EXODUS_DIVERT -j ACCEPT"
+				fi
 				for iface in $fw_inbound; do
 					echo "-A EXODUS_MANGLE -i $iface -j EXODUS_TP"
 				done
@@ -591,6 +608,8 @@ fw_start() {
 	fw_load_modules
 	if [ -n "$fw_tp_protos" ] && ! fw_has_target TPROXY; then
 		log "Proxy" "TPROXY target is not available, install the Netfilter kernel modules component of the router."
+	elif [ "$fw_v4" = 1 ] && [ "$fw_tcp_mode" = "tproxy" ] && ! fw_divert 4; then
+		log "Proxy" "socket match is not available, every TCP packet goes through the whole TPROXY chain."
 	fi
 	fw_sets_static
 	fw_sets_local
