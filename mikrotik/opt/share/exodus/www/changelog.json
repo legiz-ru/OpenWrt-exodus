@@ -5,6 +5,16 @@
   },
   "releases": [
     {
+      "version": "1.30.7",
+      "date": "2026-11-18",
+      "en": [
+        "No changes on MikroTik: the release fixes the transparent proxy of Keenetic."
+      ],
+      "ru": [
+        "На MikroTik без изменений: выпуск исправляет прозрачный прокси Keenetic."
+      ]
+    },
+    {
       "version": "1.30.6",
       "date": "2026-11-17",
       "en": [
