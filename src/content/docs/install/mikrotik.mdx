@@ -78,13 +78,15 @@ import { Steps } from '@astrojs/starlight/components';
 | `exodusIPv6` | `no` | `yes` даёт контейнеру `fd65:786f:6475::2/64` и NAT66, тогда проксируется и IPv6 |
 | `exodusImage` | `prettyleaf/exodus-mikrotik:latest` | образ на ghcr.io |
 | `exodusFile` | — | файл образа на роутере вместо реестра, `github` скачивает `exodus-mikrotik-<arch>.tar` из релиза [mikrotik-image](https://github.com/prettyleaf/openwrt-exodus/releases/tag/mikrotik-image) |
-| `exodusGhProxy` | — | [gh-proxy](/install/options/#если-github-заблокирован) для GitHub: файл образа и обновления внутри контейнера |
+| `exodusGhProxy` | — | [gh-proxy](/install/options/#если-github-заблокирован) для GitHub: файл образа и обновления внутри контейнера. Без него обновления качают напрямую, затем через публичные зеркала |
 
-Если ghcr.io недоступен, скачайте файл образа через gh-proxy:
+Если ghcr.io недоступен, скачайте файл образа через свой gh-proxy или публичное зеркало `https://gh-proxy.com`:
 
 ```text
-:global exodusFile "github"; :global exodusGhProxy "https://example.com/ghproxy/TOKEN"; /import exodus-install.rsc
+:global exodusFile "github"; :global exodusGhProxy "https://gh-proxy.com"; /import exodus-install.rsc
 ```
+
+С `exodusGhProxy` обновления внутри контейнера идут только через него.
 
 ## Подключение к RouterOS
 

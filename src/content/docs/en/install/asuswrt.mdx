@@ -35,7 +35,7 @@ In the SSH console of the router:
 curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/asuswrt/install.sh | sh
 ```
 
-The installer installs `curl jq ca-bundle lighttpd lighttpd-mod-cgi` from Entware; iptables, ipset and openssl are of the firmware, iptables and ipset match its kernel. At the end it prints the address of the [web UI](/en/usage/web-ui/), `http://192.168.50.1:9099/` with the default address of the router.
+The installer installs `curl jq ca-bundle coreutils-base64` from Entware; iptables, ipset and openssl are of the firmware, iptables and ipset match its kernel. The [web UI](/en/usage/web-ui/) of Exodus is the **VPN → Exodus** page of the web UI of the router, with its login; at the end the installer prints its address.
 
 To update, run the same command or use the **Updates** page of the web UI. Installer options are on the [Installer options](/en/install/options/) page.
 

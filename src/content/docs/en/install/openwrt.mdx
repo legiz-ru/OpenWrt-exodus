@@ -44,7 +44,7 @@ The pages in detail — [LuCI](/en/usage/luci/).
 
 ## Installing without access to GitHub
 
-When GitHub is blocked, installing through [gh-proxy](/en/install/options/#if-github-is-blocked) is the easiest. Without it, download `exodus_<arch>-<branch>.tar.gz` for your router from the [releases page](https://github.com/prettyleaf/openwrt-exodus/releases) on another machine, copy it to `/tmp` on the router and install the packages from it (only the Mihomo Meta core):
+When GitHub does not answer the router, the installer downloads through public mirrors itself, and when they do not answer either, through your [gh-proxy](/en/install/options/#if-github-is-blocked). Without it, download `exodus_<arch>-<branch>.tar.gz` for your router from the [releases page](https://github.com/prettyleaf/openwrt-exodus/releases) on another machine, copy it to `/tmp` on the router and install the packages from it (only the Mihomo Meta core):
 
 ```shell
 # <arch> is DISTRIB_ARCH from /etc/openwrt_release, <branch> is openwrt-24.10, openwrt-25.12 or SNAPSHOT

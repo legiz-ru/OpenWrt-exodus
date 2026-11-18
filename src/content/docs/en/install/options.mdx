@@ -13,7 +13,7 @@ Options are passed as environment variables after `|`, before `ash` or `sh`:
 <TabItem label="OpenWrt">
 
 ```shell
-wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.26.1 CORE=alpha ash
+wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.30.7 CORE=alpha ash
 ```
 
 </TabItem>
@@ -36,9 +36,9 @@ curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/asuswrt/i
 | Variable | Platforms | Meaning |
 | --- | --- | --- |
 | `CORE` | all | `meta`, `alpha` or `prizrak` — install this [core](#core) without asking |
-| `GH_PROXY` | all | address of [gh-proxy](#if-github-is-blocked) with the token, e.g. `https://example.com/ghproxy/TOKEN`; `GH_PROXY=` goes back to direct downloads |
+| `GH_PROXY` | all | address of [gh-proxy](#if-github-is-blocked) with the token, e.g. `https://example.com/ghproxy/TOKEN`; `GH_PROXY=` downloads only directly, without the public mirrors |
 | `LOW_SPACE=1` | all | remove the current core before installing the new one when there is little free space |
-| `VERSION` | OpenWrt | a release instead of the latest one, e.g. `v1.26.1` |
+| `VERSION` | OpenWrt | a release instead of the latest one, e.g. `v1.30.7` |
 | `PASSWORD` | Keenetic | password of the web UI on the first install, at least 4 characters. Without it the installer asks for one, Enter without a password leaves the web UI without a login |
 | `REF` | Keenetic, Asus | a branch or a tag instead of `keenetic` / `asuswrt` |
 
@@ -50,17 +50,25 @@ In a terminal the installer asks for the core, Enter keeps the current one. `COR
 
 | Core | `CORE` | What is installed |
 | --- | --- | --- |
-| Mihomo Meta | `meta` | the latest stable release of [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo/releases), the default |
+| Mihomo Meta | `meta` | the latest stable release of [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo/releases) |
 | Mihomo Alpha | `alpha` | the latest development build, [Prerelease-Alpha](https://github.com/MetaCubeX/mihomo/releases/tag/Prerelease-Alpha) |
-| Prizrak-Core | `prizrak` | the latest release of [legiz-ru/Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core/releases), a fork of mihomo |
+| Prizrak-Core | `prizrak` | the latest release of [legiz-ru/Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core/releases), a fork of mihomo, the default on a new install |
 
 The core is downloaded from its GitHub releases for the architecture of the router, the next runs of the installer and the update page update it to the latest build. On OpenWrt Mihomo Meta is installed as the `mihomo-meta` package verified by sha256, Alpha and Prizrak-Core replace its binary while the package stays installed as a dependency. Choosing Mihomo Meta again brings back the stable core of that package version.
 
 ## If GitHub is blocked
 
-The installer first checks access to GitHub. When GitHub is unreachable, it checks [jsDelivr](https://www.jsdelivr.com/): if jsDelivr is reachable, GitHub is blocked by the provider; if not, the router probably has no internet or DNS. jsDelivr serves files of the repository, but not release files, so the packages and the core come only from GitHub.
+The installer first checks access to GitHub and tries the routes in turn:
 
-The solution is [gh-proxy](https://github.com/prettyleaf/gh-proxy) on a server that can reach GitHub. Its address with the token looks like `https://example.com/ghproxy/TOKEN`. In a terminal the installer asks for the address itself. It can also be given in advance, downloading the installer through the same gh-proxy or from jsDelivr:
+1. the saved gh-proxy, if there is one;
+2. directly. When GitHub does not answer, the installer prints the reason, for example `github does not answer directly: curl: (6) Could not resolve host`, see [troubleshooting](/en/troubleshooting/#the-installer-says-github-is-unreachable) for what it means;
+3. the public mirrors `gh-proxy.com` and `ghfast.top`. The mirror that worked is saved like your own gh-proxy, the update page downloads through it.
+
+A public mirror could change the files it serves and nothing checks them: with a server of your own, prefer your own gh-proxy. `GH_PROXY=` makes the installer download only directly again, `GH_PROXY=<address>` only through that address.
+
+When the mirrors do not answer either, the installer checks [jsDelivr](https://www.jsdelivr.com/): if jsDelivr is reachable, GitHub is blocked by the provider; if not, the router probably has no internet or DNS. jsDelivr serves files of the repository, but not release files, so the packages and the core come only from GitHub.
+
+Then you need your own [gh-proxy](https://github.com/prettyleaf/gh-proxy) on a server that can reach GitHub. Its address with the token looks like `https://example.com/ghproxy/TOKEN`. In a terminal the installer asks for the address itself. It can also be given in advance, downloading the installer through the same gh-proxy or from jsDelivr:
 
 <Tabs syncKey="platform">
 <TabItem label="OpenWrt">
@@ -95,6 +103,6 @@ curl -fsSL https://cdn.jsdelivr.net/gh/prettyleaf/openwrt-exodus@asuswrt/install
 </TabItem>
 </Tabs>
 
-- The address is saved, the next runs and the update page download through it. When the saved gh-proxy does not work, the installer tries to download directly.
-- If `GHP_ALLOW_LIST` of the gh-proxy is set, allow `prettyleaf/openwrt-exodus` in it, and also `MetaCubeX/mihomo` and `legiz-ru/Prizrak-Core` for the Alpha and Prizrak-Core cores. gh-proxy answers 404 to a wrong token and to a repository outside the list.
+- The address is saved, the next runs and the update page download through it. When the saved gh-proxy does not work, the installer tries to download directly, then through the public mirrors.
+- If `GHP_ALLOW_LIST` of the gh-proxy is set, allow `prettyleaf/openwrt-exodus`, `MetaCubeX/mihomo` and `legiz-ru/Prizrak-Core` in it (on OpenWrt Mihomo Meta comes in the packages, `MetaCubeX/mihomo` is for Alpha), and `mikefarah/yq` on Keenetic, MikroTik and Asus. gh-proxy answers 404 to a wrong token and to a repository outside the list.
 - On OpenWrt the packages can also be installed without gh-proxy, from the release archive: [installing without access to GitHub](/en/install/openwrt/#installing-without-access-to-github).

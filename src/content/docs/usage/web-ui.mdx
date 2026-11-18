@@ -5,7 +5,7 @@ description: Страницы веб-интерфейса Exodus на Keenetic, 
 
 import { Steps } from '@astrojs/starlight/components';
 
-Веб-интерфейс есть на Keenetic, Asus и MikroTik, на OpenWrt его роль играет [LuCI](/usage/luci/). Адрес — `http://<адрес роутера>:9099/`. Пароль на Keenetic и MikroTik необязателен: если пропустить его при установке, интерфейс открывается без входа. Задать, сменить или убрать его можно в [«Настройки» → «Сервис»](/usage/settings/#сервис), из консоли — `exodus passwd`, удалить — `exodus passwd -d` (на MikroTik — `/container shell exodus cmd="exodus passwd -d"`). На Asus вход — через веб-интерфейс Merlin. Интерфейс на русском и английском, со светлой и тёмной темой.
+Веб-интерфейс есть на Keenetic, Asus и MikroTik, на OpenWrt его роль играет [LuCI](/usage/luci/). Адрес — `http://<адрес роутера>:9099/`, на Asus — страница **VPN → Exodus** в веб-интерфейсе роутера. Пароль на Keenetic и MikroTik необязателен: если пропустить его при установке, интерфейс открывается без входа. Задать, сменить или убрать его можно в [«Настройки» → «Сервис»](/usage/settings/#сервис), из консоли — `exodus passwd`, удалить — `exodus passwd -d` (на MikroTik — `/container shell exodus cmd="exodus passwd -d"`). На Asus вход — через веб-интерфейс Merlin. Интерфейс на русском и английском, со светлой и тёмной темой.
 
 ## Быстрый старт
 

@@ -13,7 +13,7 @@ The OpenWrt version is a fork of [OpenWrt-nikki](https://github.com/nikkinikki-o
 | --- | --- | --- | --- |
 | [OpenWrt](/en/install/openwrt/) 24.10+ | `main` | LuCI: Services → Exodus | Nikki |
 | [Keenetic / Netcraze](/en/install/keenetic/) | `keenetic` | [own web UI](/en/usage/web-ui/), port 9099 | XKeen |
-| [Asus with Asuswrt-Merlin](/en/install/asuswrt/) | `asuswrt` | [own web UI](/en/usage/web-ui/), port 9099 | XRAYUI and similar |
+| [Asus with Asuswrt-Merlin](/en/install/asuswrt/) | `asuswrt` | [a page in the web UI of the router](/en/usage/web-ui/): VPN → Exodus | XRAYUI and similar |
 | [MikroTik](/en/install/mikrotik/) with RouterOS 7.20+ | `mikrotik` | [own web UI](/en/usage/web-ui/), port 9099 | — |
 
 Exodus has one version for all routers, the version of the [release](https://github.com/prettyleaf/openwrt-exodus/releases).
@@ -26,7 +26,7 @@ Exodus has one version for all routers, the version of the [release](https://git
 - Your own rules and a [mixin file](/en/usage/overrides/) over the profile, an editor of the files on the router.
 - DSCP marks to choose the route per application (Keenetic, Asus, MikroTik).
 - Choice of the core: Mihomo Meta, Mihomo Alpha or Prizrak-Core.
-- Updates from the UI and installation through your own [gh-proxy](/en/install/options/#if-github-is-blocked) when the provider blocks GitHub.
+- Updates from the UI and installation even when GitHub does not answer the router: through public mirrors or your own [gh-proxy](/en/install/options/#if-github-is-blocked).
 - The MIBoard dashboard right in the web UI and LuCI (or Zashboard, MetaCubeXD, YACD; Zashboard by default on Asus) to choose proxies and watch connections.
 
 The specifics of each firmware are on its installation page.

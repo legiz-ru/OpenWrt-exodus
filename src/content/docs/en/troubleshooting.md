@@ -5,7 +5,16 @@ description: Common problems and what to do about them.
 
 ## The installer says GitHub is unreachable
 
-`github.com is unreachable, but cdn.jsdelivr.net is reachable` — GitHub is blocked by the provider: install through [gh-proxy](/en/install/options/#if-github-is-blocked). If jsDelivr is unreachable too, check the internet connection and DNS of the router.
+When GitHub does not answer directly, the installer tries the public mirrors `gh-proxy.com` and `ghfast.top` itself and tells why the direct route failed: `github does not answer directly: <reason>`. A release link that opens in the browser proves nothing: the browser uses its own DNS and clock, the installer runs on the router.
+
+| Reason | What to check |
+| --- | --- |
+| `Could not resolve host`, `Failed to establish connection` | DNS of the router. When another proxy with Fake-IP runs (Nikki, XKeen and others), stop it or let the traffic of the router itself through it |
+| `SSL certificate problem`, `Invalid SSL certificate` | the clock of the router (the installer shows it) and the `ca-bundle` / `ca-certificates` package |
+| `Connection reset by peer`, `Connection timed out`, `Operation timed out` | the provider slows down GitHub: the mirrors or a [gh-proxy](/en/install/options/#if-github-is-blocked) are enough |
+| `The requested URL returned error: 404` | no such branch, tag or release for the architecture, check `REF` / `VERSION` |
+
+`github.com is unreachable, but cdn.jsdelivr.net is reachable` — the mirrors did not answer either, GitHub is blocked by the provider: install through your own [gh-proxy](/en/install/options/#if-github-is-blocked). If jsDelivr is unreachable too, check the internet connection and DNS of the router.
 
 ## Not enough space for the core
 

@@ -5,7 +5,16 @@ description: Частые проблемы и что с ними делать.
 
 ## Установщик пишет, что GitHub недоступен
 
-`github.com is unreachable, but cdn.jsdelivr.net is reachable` — GitHub блокирует провайдер: ставьте через [gh-proxy](/install/options/#если-github-заблокирован). Если недоступен и jsDelivr, проверьте интернет и DNS роутера.
+Если GitHub не отвечает напрямую, установщик сам пробует публичные зеркала `gh-proxy.com` и `ghfast.top` и пишет, почему не сработал прямой путь: `github does not answer directly: <причина>`. Ссылка на релиз, которая открывается в браузере, ничего не доказывает: браузер ходит со своим DNS и своими часами, а установщик — с роутера.
+
+| Причина | Что проверить |
+| --- | --- |
+| `Could not resolve host`, `Failed to establish connection` | DNS роутера. Если работает другой прокси с Fake-IP (Nikki, XKeen и т. п.), остановите его или пустите через него трафик самого роутера |
+| `SSL certificate problem`, `Invalid SSL certificate` | часы роутера (установщик их показывает) и пакет `ca-bundle` / `ca-certificates` |
+| `Connection reset by peer`, `Connection timed out`, `Operation timed out` | провайдер режет GitHub: хватит зеркал или [gh-proxy](/install/options/#если-github-заблокирован) |
+| `The requested URL returned error: 404` | нет ветки, тега или релиза под архитектуру, проверьте `REF` / `VERSION` |
+
+`github.com is unreachable, but cdn.jsdelivr.net is reachable` — не ответили и зеркала, GitHub блокирует провайдер: ставьте через свой [gh-proxy](/install/options/#если-github-заблокирован). Если недоступен и jsDelivr, проверьте интернет и DNS роутера.
 
 ## Не хватает места для ядра
 

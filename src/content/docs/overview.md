@@ -13,7 +13,7 @@ Exodus — прокси на ядре [Mihomo](https://github.com/MetaCubeX/miho
 | --- | --- | --- | --- |
 | [OpenWrt](/install/openwrt/) 24.10+ | `main` | LuCI: «Службы» → «Exodus» | Nikki |
 | [Keenetic / Netcraze](/install/keenetic/) | `keenetic` | [свой веб-интерфейс](/usage/web-ui/), порт 9099 | XKeen |
-| [Asus с Asuswrt-Merlin](/install/asuswrt/) | `asuswrt` | [свой веб-интерфейс](/usage/web-ui/), порт 9099 | XRAYUI и подобные |
+| [Asus с Asuswrt-Merlin](/install/asuswrt/) | `asuswrt` | [страница в веб-интерфейсе роутера](/usage/web-ui/): VPN → Exodus | XRAYUI и подобные |
 | [MikroTik](/install/mikrotik/) с RouterOS 7.20+ | `mikrotik` | [свой веб-интерфейс](/usage/web-ui/), порт 9099 | — |
 
 У Exodus одна версия для всех роутеров — версия [релиза](https://github.com/prettyleaf/openwrt-exodus/releases).
@@ -26,7 +26,7 @@ Exodus — прокси на ядре [Mihomo](https://github.com/MetaCubeX/miho
 - Свои правила и [mixin-файл](/usage/overrides/) поверх профиля, редактор файлов на роутере.
 - Метки DSCP для выбора маршрута отдельными приложениями (Keenetic, Asus, MikroTik).
 - Выбор ядра: Mihomo Meta, Mihomo Alpha или Prizrak-Core.
-- Обновление из интерфейса и установка через свой [gh-proxy](/install/options/#если-github-заблокирован), если провайдер блокирует GitHub.
+- Обновление из интерфейса и установка, даже если GitHub не отвечает роутеру: через публичные зеркала или свой [gh-proxy](/install/options/#если-github-заблокирован).
 - Панель MIBoard прямо в веб-интерфейсе и LuCI (или Zashboard, MetaCubeXD, YACD; на Asus по умолчанию Zashboard) для выбора прокси и просмотра соединений.
 
 Особенности каждой прошивки — на странице установки для неё.

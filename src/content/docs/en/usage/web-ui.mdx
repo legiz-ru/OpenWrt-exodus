@@ -5,7 +5,7 @@ description: Pages of the Exodus web UI on Keenetic, Asus and MikroTik.
 
 import { Steps } from '@astrojs/starlight/components';
 
-The web UI runs on Keenetic, Asus and MikroTik, on OpenWrt [LuCI](/en/usage/luci/) plays its role. The address is `http://<router address>:9099/`. On Keenetic and MikroTik the password is optional: skipped in the installer, the UI opens without a login. Set, change or remove it on [Settings → Service](/en/usage/settings/#service), from the console with `exodus passwd`, remove it with `exodus passwd -d` (on MikroTik `/container shell exodus cmd="exodus passwd -d"`). On Asus the login is the one of the Merlin web UI. The UI is in English and Russian, with light and dark themes.
+The web UI runs on Keenetic, Asus and MikroTik, on OpenWrt [LuCI](/en/usage/luci/) plays its role. The address is `http://<router address>:9099/`, on Asus it is the **VPN → Exodus** page of the web UI of the router. On Keenetic and MikroTik the password is optional: skipped in the installer, the UI opens without a login. Set, change or remove it on [Settings → Service](/en/usage/settings/#service), from the console with `exodus passwd`, remove it with `exodus passwd -d` (on MikroTik `/container shell exodus cmd="exodus passwd -d"`). On Asus the login is the one of the Merlin web UI. The UI is in English and Russian, with light and dark themes.
 
 ## Quick start
 

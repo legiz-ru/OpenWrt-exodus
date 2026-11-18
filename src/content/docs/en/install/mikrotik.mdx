@@ -78,13 +78,15 @@ Global variables set before the import:
 | `exodusIPv6` | `no` | `yes` gives the container `fd65:786f:6475::2/64` and NAT66, IPv6 is proxied then |
 | `exodusImage` | `prettyleaf/exodus-mikrotik:latest` | the image on ghcr.io |
 | `exodusFile` | — | an image file on the router instead of the registry, `github` downloads `exodus-mikrotik-<arch>.tar` of the [mikrotik-image](https://github.com/prettyleaf/openwrt-exodus/releases/tag/mikrotik-image) release |
-| `exodusGhProxy` | — | [gh-proxy](/en/install/options/#if-github-is-blocked) for GitHub: the image file and the updates inside the container |
+| `exodusGhProxy` | — | [gh-proxy](/en/install/options/#if-github-is-blocked) for GitHub: the image file and the updates inside the container. Without it the updates download directly, then through public mirrors |
 
-Without access to ghcr.io, download the image file through gh-proxy:
+Without access to ghcr.io, download the image file through your gh-proxy or the public mirror `https://gh-proxy.com`:
 
 ```text
-:global exodusFile "github"; :global exodusGhProxy "https://example.com/ghproxy/TOKEN"; /import exodus-install.rsc
+:global exodusFile "github"; :global exodusGhProxy "https://gh-proxy.com"; /import exodus-install.rsc
 ```
+
+With `exodusGhProxy` the updates inside the container go only through it.
 
 ## Connection to RouterOS
 
