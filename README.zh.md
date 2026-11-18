@@ -10,7 +10,7 @@
 
 在 OpenWrt 上使用 Mihomo 进行透明代理。[OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki) 的分支。
 
-其他路由器有各自的分支：[Keenetic / Netcraze](https://github.com/prettyleaf/openwrt-exodus/tree/keenetic)（基于 Entware，替代 XKeen）和 [运行 Asuswrt-Merlin 的华硕路由器](https://github.com/prettyleaf/openwrt-exodus/tree/asuswrt)（基于 Entware）。
+其他路由器有各自的分支：[Keenetic / Netcraze](https://github.com/prettyleaf/openwrt-exodus/tree/keenetic)（基于 Entware，替代 XKeen）、[MikroTik](https://github.com/prettyleaf/openwrt-exodus/tree/mikrotik)（运行在 RouterOS 容器中）和 [运行 Asuswrt-Merlin 的华硕路由器](https://github.com/prettyleaf/openwrt-exodus/tree/asuswrt)（基于 Entware）。
 
 ## 环境要求
 
@@ -23,7 +23,7 @@
 - 透明代理 (Redirect/TPROXY/TUN, IPv4 和/或 IPv6)，默认 TCP Redirect + UDP TPROXY
 - 官方 Mihomo 内核：`mihomo-meta` 打包 [MetaCubeX 发行版](https://github.com/MetaCubeX/mihomo/releases) 中的预编译二进制文件，并校验 sha256
 - 在安装脚本和更新页面中选择内核：[Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core)、稳定版 Mihomo Meta 或 Mihomo Alpha
-- 运营商屏蔽 GitHub 时，可通过自建的 [gh-proxy](https://github.com/prettyleaf/gh-proxy) 安装
+- 路由器无法直连 GitHub 时，可通过公共镜像 `gh-proxy.com`、`ghfast.top` 或自建的 [gh-proxy](https://github.com/prettyleaf/gh-proxy) 安装
 - 按设备选择代理：代理除所选设备外的所有设备，或仅代理所选设备
 - 订阅 HWID 请求头，默认启用
 - 订阅提供商的响应头：`profile-title` 作为订阅名称，`announce` 和 `support-url` 显示在状态页，`profile-logo` 显示在订阅旁
@@ -40,17 +40,17 @@
 wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | ash
 ```
 
-安装脚本首先检查路由器能否从 GitHub 下载，然后询问要安装哪个[内核](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#core)。运行参数[可以](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#variables)以环境变量的形式写在 `ash` 之前。
+安装脚本首先检查路由器能否从 GitHub 下载。如果 GitHub 无法直连，它会显示原因并通过公共镜像 `gh-proxy.com` 和 `ghfast.top` 下载，然后才询问自建的 [gh-proxy](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#if-github-is-blocked)。之后询问要安装哪个[内核](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#core)。运行参数[可以](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#variables)以环境变量的形式写在 `ash` 之前。
 
 ```shell
-wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.26.1 CORE=alpha ash
+wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.30.7 CORE=alpha ash
 ```
 
 已安装的软件包也可以在 LuCI 中更新：`服务 → Exodus → 更新`。该页面使用上次选择的内核和 gh-proxy 运行同一个安装脚本，也可以在该页面选择其他内核：`Change Core` 会安装它的最新版本。闪存空间较小的路由器请在该页面启用低空间模式，它会在安装新内核之前删除当前内核。
 
 ### 版本
 
-Exodus 所有路由器使用同一个版本号，即[发行版](https://github.com/prettyleaf/openwrt-exodus/releases)的版本：标签 `v1.27.0` 构建出 `exodus` 和 `luci-app-exodus` 1.27.0，Keenetic 和 Asuswrt-Merlin 分支显示相同的版本号。`mihomo-meta` 的版本是其打包的 Mihomo 内核版本。1.27.0 之前 `exodus` 使用日期作为版本（`2026.04.08`），安装脚本会将其替换为发行版的版本。
+Exodus 所有路由器使用同一个版本号，即[发行版](https://github.com/prettyleaf/openwrt-exodus/releases)的版本：标签 `v1.27.0` 构建出 `exodus` 和 `luci-app-exodus` 1.27.0，Keenetic、MikroTik 和 Asuswrt-Merlin 分支显示相同的版本号。`mihomo-meta` 的版本是其打包的 Mihomo 内核版本。
 
 ## 从 Nikki 迁移
 
@@ -112,6 +112,7 @@ make package/luci-app-exodus/compile
 - kmod-nft-tproxy
 - kmod-tun
 - kmod-dummy
+- mihomo（`mihomo-meta`）
 
 ## 特别感谢
 

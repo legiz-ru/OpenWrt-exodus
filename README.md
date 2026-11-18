@@ -10,7 +10,7 @@ English | [中文](README.zh.md)
 
 Transparent Proxy with Mihomo on OpenWrt. Fork of [OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki).
 
-Other routers have their own branches: [Keenetic / Netcraze](https://github.com/prettyleaf/openwrt-exodus/tree/keenetic) with Entware, in place of XKeen, and [Asus with Asuswrt-Merlin](https://github.com/prettyleaf/openwrt-exodus/tree/asuswrt) with Entware.
+Other routers have their own branches: [Keenetic / Netcraze](https://github.com/prettyleaf/openwrt-exodus/tree/keenetic) with Entware, in place of XKeen, [MikroTik](https://github.com/prettyleaf/openwrt-exodus/tree/mikrotik) in a container of RouterOS and [Asus with Asuswrt-Merlin](https://github.com/prettyleaf/openwrt-exodus/tree/asuswrt) with Entware.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ Other routers have their own branches: [Keenetic / Netcraze](https://github.com/
 - Transparent Proxy (Redirect/TPROXY/TUN, IPv4 and/or IPv6), TCP Redirect + UDP TPROXY by default
 - Official Mihomo core: `mihomo-meta` packages the prebuilt binary from [MetaCubeX releases](https://github.com/MetaCubeX/mihomo/releases), verified by sha256
 - Choice of the core in the installer and on the update page: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), stable Mihomo Meta or Mihomo Alpha
-- Installation through your own [gh-proxy](https://github.com/prettyleaf/gh-proxy) when GitHub is blocked by the provider
+- Installation when GitHub does not answer the router: through the public mirrors `gh-proxy.com` and `ghfast.top` or your own [gh-proxy](https://github.com/prettyleaf/gh-proxy)
 - Per-device proxy selection: proxy everyone except the selected devices, or only the selected devices
 - HWID headers for subscriptions, enabled by default
 - Provider headers of subscriptions: `profile-title` names the subscription, `announce` and `support-url` are shown on the status page, `profile-logo` next to the subscription
@@ -40,17 +40,17 @@ The packages are `exodus`, `luci-app-exodus` and `luci-i18n-exodus-*`. If `nikki
 wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | ash
 ```
 
-The installer first checks that the router can download from GitHub, then asks which [core](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#core) to install. Settings for a run [can be](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#variables) passed as environment variables before `ash`.
+The installer first checks that the router can download from GitHub. When GitHub does not answer directly, it prints the reason and downloads through the public mirrors `gh-proxy.com` and `ghfast.top`, then asks for your own [gh-proxy](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#if-github-is-blocked). Then it asks which [core](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#core) to install. Settings for a run [can be](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#variables) passed as environment variables before `ash`.
 
 ```shell
-wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.26.1 CORE=alpha ash
+wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.30.7 CORE=alpha ash
 ```
 
 Installed packages can also be updated from LuCI: `Services → Exodus → Update`. It runs the same installer with the core and the gh-proxy chosen last time, another core is chosen there too: `Change Core` installs its latest build. On routers with little free flash enable the low flash space mode there, it removes the current core before installing the new one.
 
 ### Versions
 
-Exodus has one version for all routers, the version of the [release](https://github.com/prettyleaf/openwrt-exodus/releases): the tag `v1.27.0` builds `exodus` and `luci-app-exodus` 1.27.0, the Keenetic and Asuswrt-Merlin branches show the same numbers. `mihomo-meta` has the version of the Mihomo core it packages. Before 1.27.0 `exodus` had versions by date (`2026.04.08`), the installer replaces them with the release one.
+Exodus has one version for all routers, the version of the [release](https://github.com/prettyleaf/openwrt-exodus/releases): the tag `v1.27.0` builds `exodus` and `luci-app-exodus` 1.27.0, the Keenetic, MikroTik and Asuswrt-Merlin branches show the same numbers. `mihomo-meta` has the version of the Mihomo core it packages.
 
 ## Migrating from Nikki
 
@@ -112,6 +112,7 @@ The package files will be found under `bin/packages/your_architecture/exodus`.
 - kmod-nft-tproxy
 - kmod-tun
 - kmod-dummy
+- mihomo (`mihomo-meta`)
 
 ## Special Thanks
 
