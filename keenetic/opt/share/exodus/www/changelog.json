@@ -5,6 +5,16 @@
   },
   "releases": [
     {
+      "version": "1.30.7",
+      "date": "2026-11-18",
+      "en": [
+        "The transparent proxy works again. In 1.30.6 a typo in the list of firewall chains left out EXODUS_TP: the rules were not applied, traffic went past the proxy and the log repeated “Couldn't load target EXODUS_TP”."
+      ],
+      "ru": [
+        "Прозрачный прокси снова работает. В 1.30.6 из-за опечатки в списке цепочек файрвола пропала EXODUS_TP: правила не применялись, трафик шёл мимо прокси, а в журнале повторялось «Couldn't load target EXODUS_TP»."
+      ]
+    },
+    {
       "version": "1.30.6",
       "date": "2026-11-17",
       "en": [
