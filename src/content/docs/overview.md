@@ -25,7 +25,7 @@ Exodus — прокси на ядре [Mihomo](https://github.com/MetaCubeX/miho
 - [Подписки](/usage/subscriptions/) с автообновлением по интервалу провайдера, заголовки провайдера (название, анонс, логотип, трафик) и HWID для панелей с лимитом устройств.
 - Свои правила и [mixin-файл](/usage/overrides/) поверх профиля, редактор файлов на роутере.
 - Метки DSCP для выбора маршрута отдельными приложениями (Keenetic, Asus, MikroTik).
-- Выбор ядра: Mihomo Meta, Mihomo Alpha или Prizrak-Core.
+- Выбор ядра: Mihomo Meta, Mihomo Alpha, Prizrak-Core или Prizrak-Kroha.
 - Обновление из интерфейса и установка, даже если GitHub не отвечает роутеру: через публичные зеркала или свой [gh-proxy](/install/options/#если-github-заблокирован).
 - Панель MIBoard прямо в веб-интерфейсе и LuCI (или Zashboard, MetaCubeXD, YACD; на Asus по умолчанию Zashboard) для выбора прокси и просмотра соединений.
 

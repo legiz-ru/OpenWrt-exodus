@@ -25,7 +25,7 @@ Exodus has one version for all routers, the version of the [release](https://git
 - [Subscriptions](/en/usage/subscriptions/) updated by the interval of the provider, provider headers (title, announce, logo, traffic) and HWID for panels with a device limit.
 - Your own rules and a [mixin file](/en/usage/overrides/) over the profile, an editor of the files on the router.
 - DSCP marks to choose the route per application (Keenetic, Asus, MikroTik).
-- Choice of the core: Mihomo Meta, Mihomo Alpha or Prizrak-Core.
+- Choice of the core: Mihomo Meta, Mihomo Alpha, Prizrak-Core or Prizrak-Kroha.
 - Updates from the UI and installation even when GitHub does not answer the router: through public mirrors or your own [gh-proxy](/en/install/options/#if-github-is-blocked).
 - The MIBoard dashboard right in the web UI and LuCI (or Zashboard, MetaCubeXD, YACD; Zashboard by default on Asus) to choose proxies and watch connections.
 
