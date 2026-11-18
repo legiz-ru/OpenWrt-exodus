@@ -68,12 +68,16 @@ gh_url() {
 # returns 0 on success, 8 if github answered with an error (the file is missing), other codes if github is unreachable
 check_github() {
 	local index ret
-	index=$(wget -q -T 15 -O - "$(gh_url "$index_url")" 2> /dev/null)
+	index=$(wget -T 15 -O - "$(gh_url "$index_url")" 2> /tmp/exodus-github.err)
 	ret=$?
 	# a wrong gh-proxy address may answer with some web page
 	if [ "$ret" = 0 ] && ! echo "$index" | grep -q '"packages"'; then
 		ret=1
+		echo "the answer is not the expected file" > /tmp/exodus-github.err
 	fi
+	# the last line of the error, progress lines of wget end with \r
+	check_error=$(tr '\r' '\n' < /tmp/exodus-github.err 2> /dev/null | grep . | tail -n 1)
+	rm -f /tmp/exodus-github.err
 	# older releases have no tag in the index
 	release_tag=$(echo "$index" | jsonfilter -q -e '@.tag' 2> /dev/null)
 	return "$ret"
@@ -266,9 +270,12 @@ note "${DISTRIB_DESCRIPTION:-OpenWrt $DISTRIB_RELEASE}, $arch, $package_manager"
 temp_dir="/tmp/exodus-install"
 rm -rf "$temp_dir"
 mkdir -p "$temp_dir"
-trap 'rm -rf "$temp_dir"' EXIT
+# a proxy stopped for the downloads is started again if the installer fails
+trap 'rm -rf "$temp_dir"; [ "$proxy_stopped" = 1 ] && [ -x "/etc/init.d/nikki" ] && /etc/init.d/nikki start' EXIT
 
-# access to github: through the given or the saved gh-proxy, then directly
+# access to github: through the given or the saved gh-proxy, then directly, then through public mirrors
+# public gh-proxy mirrors, tried when github does not answer directly
+public_mirrors="https://gh-proxy.com https://ghfast.top"
 saved_gh_proxy=$(uci -q get nikki.update.gh_proxy)
 if [ "${GH_PROXY+set}" = "set" ]; then
 	case "$GH_PROXY" in
@@ -278,7 +285,7 @@ if [ "${GH_PROXY+set}" = "set" ]; then
 	routes="${GH_PROXY:-direct}"
 	save_gh_proxy=1
 else
-	routes="$saved_gh_proxy direct"
+	routes="$saved_gh_proxy direct $public_mirrors"
 fi
 step "Checking access to GitHub"
 github_status=1
@@ -287,12 +294,39 @@ for route in $routes; do
 	[ "$route" = "direct" ] && gh_proxy=""
 	check_github
 	status=$?
+	[ "$route" = "direct" ] && direct_error="$check_error"
 	if [ "$status" = 0 ]; then
 		github_status=0
 		break
 	fi
-	[ "$status" = 8 ] && github_status=8
+	# a public mirror may refuse by its own limits, only github and the own gh-proxy tell a missing file
+	case " $public_mirrors " in *" $route "*) ;; *) [ "$status" = 8 ] && github_status=8 ;; esac
 done
+if [ -n "$direct_error" ]; then
+	warn "github does not answer directly: $direct_error"
+	case "$direct_error" in
+		*[Cc]ertificate*|*SSL*) note "the clock of the router is $(date '+%Y-%m-%d %H:%M'): a wrong clock or a missing CA bundle fails the certificate check" ;;
+	esac
+fi
+if [ "$github_status" = 0 ] && [ -n "$gh_proxy" ] && [ "$gh_proxy" != "${saved_gh_proxy%/}" ]; then
+	case " $public_mirrors " in
+		*" $gh_proxy "*)
+			# saved for the update page, the installer with GH_PROXY= returns to github directly
+			save_gh_proxy=1
+			note "downloading through the public mirror $gh_proxy, run the installer with GH_PROXY= to download directly again"
+			;;
+	esac
+fi
+# the running nikki (or exodus) proxies the router itself, a broken route of its profile hides a reachable github
+if [ "$github_status" = 1 ] && [ -z "$GH_PROXY" ] && [ -x "/etc/init.d/nikki" ] && /etc/init.d/nikki running > /dev/null 2>&1; then
+	warn "github is unreachable through the running proxy, stopping it and trying directly"
+	/etc/init.d/nikki stop
+	proxy_stopped=1
+	gh_proxy=""
+	check_github
+	github_status=$?
+	[ "$github_status" = 0 ] || [ "$github_status" = 8 ] || github_status=1
+fi
 if [ "$github_status" = 8 ]; then
 	fail "no prebuilt packages for $arch-$branch in release ${VERSION:-latest}, see README for supported architectures (gh-proxy also answers 404 to a wrong token and to repositories outside GHP_ALLOW_LIST)"
 fi
@@ -536,6 +570,7 @@ fi
 uci -q commit nikki
 
 # restart to run the new core
+proxy_stopped=0
 if [ -x "/etc/init.d/nikki" ]; then
 	step "Restarting the service"
 	/etc/init.d/nikki restart
