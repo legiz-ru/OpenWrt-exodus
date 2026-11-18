@@ -22,7 +22,7 @@
 
 - 透明代理 (Redirect/TPROXY/TUN, IPv4 和/或 IPv6)，默认 TCP Redirect + UDP TPROXY
 - 官方 Mihomo 内核：`mihomo-meta` 打包 [MetaCubeX 发行版](https://github.com/MetaCubeX/mihomo/releases) 中的预编译二进制文件，并校验 sha256
-- 在安装脚本和更新页面中选择内核：[Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core)、稳定版 Mihomo Meta 或 Mihomo Alpha
+- 在安装脚本和更新页面中选择内核：[Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core)、稳定版 Mihomo Meta、Mihomo Alpha 或 Prizrak-Kroha（面向闪存较小路由器的 Prizrak-Core 精简版，支持 amd64、arm64、armv7、mips 和 mipsle；`prizrak-kroha-upx` 为同一版本的 UPX 压缩版）
 - 路由器无法直连 GitHub 时，可通过公共镜像 `gh-proxy.com`、`ghfast.top` 或自建的 [gh-proxy](https://github.com/prettyleaf/gh-proxy) 安装
 - 按设备选择代理：代理除所选设备外的所有设备，或仅代理所选设备
 - 订阅 HWID 请求头，默认启用

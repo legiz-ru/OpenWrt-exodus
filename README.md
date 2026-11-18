@@ -22,7 +22,7 @@ Other routers have their own branches: [Keenetic / Netcraze](https://github.com/
 
 - Transparent Proxy (Redirect/TPROXY/TUN, IPv4 and/or IPv6), TCP Redirect + UDP TPROXY by default
 - Official Mihomo core: `mihomo-meta` packages the prebuilt binary from [MetaCubeX releases](https://github.com/MetaCubeX/mihomo/releases), verified by sha256
-- Choice of the core in the installer and on the update page: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), stable Mihomo Meta or Mihomo Alpha
+- Choice of the core in the installer and on the update page: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), stable Mihomo Meta, Mihomo Alpha or Prizrak-Kroha, the lighter build of Prizrak-Core for routers with little flash (amd64, arm64, armv7, mips and mipsle; `prizrak-kroha-upx` is the same build packed with UPX)
 - Installation when GitHub does not answer the router: through the public mirrors `gh-proxy.com` and `ghfast.top` or your own [gh-proxy](https://github.com/prettyleaf/gh-proxy)
 - Per-device proxy selection: proxy everyone except the selected devices, or only the selected devices
 - HWID headers for subscriptions, enabled by default

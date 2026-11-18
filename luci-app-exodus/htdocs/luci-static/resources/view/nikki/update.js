@@ -27,8 +27,12 @@ return view.extend({
         const installed = info.installed ?? {};
         const latest = info.latest ?? {};
         const core = info.core ?? {};
-        const coreTitles = { prizrak: 'Prizrak-Core', meta: 'Mihomo Meta', alpha: 'Mihomo Alpha' };
+        const coreTitles = { prizrak: 'Prizrak-Core', meta: 'Mihomo Meta', alpha: 'Mihomo Alpha', 'prizrak-kroha': 'Prizrak-Kroha', 'prizrak-kroha-upx': 'Prizrak-Kroha UPX' };
         const currentCore = coreTitles[core.type] ? core.type : 'meta';
+        // Prizrak-Kroha has builds for fewer architectures, it is offered only where the installer finds one
+        const coreChoices = Object.keys(coreTitles).filter(function (type) {
+            return info.kroha !== false || (type !== 'prizrak-kroha' && type !== 'prizrak-kroha-upx') || type === currentCore;
+        });
 
         let updateAvailable = false;
         const row = function (title, current, next) {
@@ -51,7 +55,7 @@ return view.extend({
             row(`${_('Service')} (exodus)`, installed['exodus'], latest['exodus']),
         ];
         // an alternative core replaces the binary of mihomo-meta, the installer keeps the package only as a dependency
-        if (core.type === 'alpha' || core.type === 'prizrak') {
+        if (core.type !== 'meta' && coreTitles[core.type]) {
             rows.push(row(`${_('Core')} (${coreTitles[core.type]})`, core.installed, core.latest));
         } else {
             rows.push(row(`${_('Core')} (mihomo-meta)`, installed['mihomo-meta'], latest['mihomo-meta']));
@@ -110,7 +114,7 @@ return view.extend({
         const lowSpace = E('input', { type: 'checkbox', id: 'low_space', checked: lowSpaceSuggested ? '' : null });
 
         // another core is installed by the update: the latest build of it, then the next updates follow it
-        const coreSelect = E('select', { class: 'cbi-input-select', id: 'core' }, Object.keys(coreTitles).map(function (type) {
+        const coreSelect = E('select', { class: 'cbi-input-select', id: 'core' }, coreChoices.map(function (type) {
             return E('option', { value: type, selected: type === currentCore ? '' : null }, coreTitles[type]);
         }));
 

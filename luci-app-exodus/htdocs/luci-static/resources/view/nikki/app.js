@@ -195,7 +195,7 @@ return view.extend({
         const appVersion = data[1].app ?? '';
         const coreVersion = data[1].core ?? '';
         // the installer saves an alternative core, Prizrak-Core reports the same version as Mihomo Meta
-        const coreTitle = { alpha: 'Mihomo Alpha', prizrak: 'Prizrak-Core' }[uci.get('nikki', 'update', 'core')] ?? 'Mihomo Meta';
+        const coreTitle = { alpha: 'Mihomo Alpha', prizrak: 'Prizrak-Core', 'prizrak-kroha': 'Prizrak-Kroha', 'prizrak-kroha-upx': 'Prizrak-Kroha UPX' }[uci.get('nikki', 'update', 'core')] ?? 'Mihomo Meta';
         const service = serviceView({ app: appVersion, core: coreVersion ? `${coreVersion} · ${coreTitle}` : '' }, data[2]);
         const profiles = data[3];
         const hosts = data[4].hosts;

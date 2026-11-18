@@ -4,7 +4,8 @@
 # downloads packages for this router directly from GitHub releases and installs them locally
 # VERSION=<tag>   install a specific release instead of the latest one
 # LOW_SPACE=1     remove the current core before installing the new one, for routers with little free flash
-# CORE=<core>     install this core without asking: prizrak (Prizrak-Core), meta (stable, packaged) or alpha (Mihomo Alpha)
+# CORE=<core>     install this core without asking: prizrak (Prizrak-Core), meta (stable, packaged), alpha (Mihomo Alpha),
+#                 prizrak-kroha (Prizrak-Kroha, the lighter router build of Prizrak-Core) or prizrak-kroha-upx (the same, packed with UPX)
 # GH_PROXY=<url>  download from GitHub through gh-proxy (https://github.com/prettyleaf/gh-proxy), e.g. https://example.com/ghproxy/TOKEN, empty to download directly
 # the core and GH_PROXY are saved in /etc/config/nikki, the next runs and the update page use them
 
@@ -92,9 +93,16 @@ package_version() {
 	fi
 }
 
-# version of the core binary, e.g. v1.19.31 or alpha-3c947c7, empty if there is no working core
+# version of the core binary, e.g. v1.19.31, alpha-3c947c7 or v1.19.34-r4-kroha, empty if there is no working core
 core_binary_version() {
 	"$1" -v 2> /dev/null | head -n 1 | cut -d ' ' -f 3
+}
+
+# the release a core binary comes from: Prizrak-Kroha marks its version with -kroha, version.txt has the plain tag
+core_release_version() {
+	local version
+	version=$(core_binary_version "$1")
+	echo "${version%-kroha}"
 }
 
 core_title() {
@@ -102,6 +110,8 @@ core_title() {
 		prizrak) echo "Prizrak-Core" ;;
 		meta) echo "Mihomo Meta" ;;
 		alpha) echo "Mihomo Alpha" ;;
+		prizrak-kroha) echo "Prizrak-Kroha" ;;
+		prizrak-kroha-upx) echo "Prizrak-Kroha UPX" ;;
 	esac
 }
 
@@ -110,15 +120,17 @@ core_description() {
 		prizrak) echo "mihomo fork by legiz-ru" ;;
 		meta) echo "latest stable release of MetaCubeX/mihomo, packaged with Exodus" ;;
 		alpha) echo "development build of MetaCubeX/mihomo" ;;
+		prizrak-kroha) echo "lighter Prizrak-Core for routers, about 35-40 MB on flash" ;;
+		prizrak-kroha-upx) echo "Prizrak-Kroha packed with UPX: about 8-10 MB on flash, unpacked into RAM at start" ;;
 	esac
 }
 
 # the choices of the core, numbered in the order of the list
 core_menu() {
 	local number=0 type
-	for type in prizrak meta alpha; do
+	for type in prizrak meta alpha prizrak-kroha prizrak-kroha-upx; do
 		number=$((number + 1))
-		printf '    %s%s)%s %-14s %s' "$c_bold" "$number" "$c_reset" "$(core_title "$type")" "$(core_description "$type")"
+		printf '    %s%s)%s %-17s %s' "$c_bold" "$number" "$c_reset" "$(core_title "$type")" "$(core_description "$type")"
 		[ "$type" = "$current_core" ] && printf '  %s[%s]%s' "$c_info" "$current_core_tag" "$c_reset"
 		printf '\n'
 	done
@@ -254,6 +266,14 @@ case "$arch" in
 	*) core_arch="" ;;
 esac
 
+# Prizrak-Kroha is built for fewer targets: amd64 (v1), arm64, armv7 and softfloat mips/mipsle, which runs on hardfloat too
+case "$core_arch" in
+	amd64-v1) kroha_arch="amd64" ;;
+	arm64|armv7|mips-softfloat|mipsle-softfloat) kroha_arch="$core_arch" ;;
+	mipsle-hardfloat) kroha_arch="mipsle-softfloat" ;;
+	*) kroha_arch="" ;;
+esac
+
 # release url, set VERSION to install a specific release tag instead of the latest one
 if [ -n "$VERSION" ]; then
 	release_url="https://github.com/$repository/releases/download/$VERSION"
@@ -370,14 +390,15 @@ else
 	info "directly${release_tag:+, release $release_tag}"
 fi
 
-# choose the core: meta is the mihomo-meta package, alpha and prizrak replace its binary with a build from github releases
-# the current core is saved in the config, the alpha core installed by hand is detected by its version
+# choose the core: meta is the mihomo-meta package, alpha, prizrak, prizrak-kroha and prizrak-kroha-upx replace its binary with a build from github releases
+# the current core is saved in the config, the alpha and prizrak-kroha cores installed by hand are detected by their versions
 step "Choosing the core"
 current_core=$(uci -q get nikki.update.core)
 current_core_tag="current"
 if [ -z "$current_core" ]; then
 	case "$(core_binary_version /usr/libexec/mihomo)" in
 		alpha-*) current_core="alpha" ;;
+		*-kroha) current_core="prizrak-kroha" ;;
 		"") current_core="prizrak"; current_core_tag="default" ;;
 		*) current_core="meta" ;;
 	esac
@@ -386,32 +407,44 @@ core="$CORE"
 if [ -z "$core" ] && interactive; then
 	core_menu > /dev/tty
 	while [ -z "$core" ]; do
-		ask "Core" "1-3, Enter keeps $(core_title "$current_core")"
+		ask "Core" "1-5, Enter keeps $(core_title "$current_core")"
 		case "$answer" in
 			"") core="$current_core" ;;
 			1|prizrak) core="prizrak" ;;
 			2|meta) core="meta" ;;
 			3|alpha) core="alpha" ;;
-			*) warn "choose 1, 2 or 3" ;;
+			4|prizrak-kroha) core="prizrak-kroha" ;;
+			5|prizrak-kroha-upx) core="prizrak-kroha-upx" ;;
+			*) warn "choose 1, 2, 3, 4 or 5" ;;
 		esac
 	done
 fi
 core="${core:-$current_core}"
 case "$core" in
-	prizrak|meta|alpha) ;;
-	*) fail "unknown core: $core, use prizrak, meta or alpha" ;;
+	prizrak|meta|alpha|prizrak-kroha|prizrak-kroha-upx) ;;
+	*) fail "unknown core: $core, use prizrak, meta, alpha, prizrak-kroha or prizrak-kroha-upx" ;;
 esac
 
 # find the latest build of an alternative core before anything is changed, the releases publish its version in version.txt
 if [ "$core" != "meta" ]; then
 	[ -n "$core_arch" ] || fail "no $(core_title "$core") build for $arch"
-	if [ "$core" = "alpha" ]; then
-		core_release="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha"
-		core_asset="mihomo-linux-$core_arch"
-	else
-		core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
-		core_asset="prizrak-core-linux-$core_arch"
-	fi
+	case "$core" in
+		alpha)
+			core_release="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha"
+			core_asset="mihomo-linux-$core_arch"
+			;;
+		prizrak)
+			core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
+			core_asset="prizrak-core-linux-$core_arch"
+			;;
+		prizrak-kroha|prizrak-kroha-upx)
+			# Prizrak-Kroha is published in the releases of Prizrak-Core, the UPX build has -compressed before the version
+			[ -n "$kroha_arch" ] || fail "no $(core_title "$core") build for $arch, choose Prizrak-Core"
+			core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
+			core_asset="prizrak-kroha-linux-$kroha_arch"
+			[ "$core" = "prizrak-kroha-upx" ] && core_asset="$core_asset-compressed"
+			;;
+	esac
 	core_latest=$(wget -q -T 15 -O - "$(gh_url "$core_release/version.txt")" 2> /dev/null | head -n 1)
 	if ! echo "$core_latest" | grep -q -E '^[A-Za-z0-9._-]+$'; then
 		fail "failed to get the latest version of $(core_title "$core") from $core_release"
@@ -551,7 +584,7 @@ if [ "$core" = "meta" ]; then
 	else
 		info "$(core_title "$core") $(core_binary_version /usr/libexec/mihomo) of the mihomo-meta package"
 	fi
-elif [ "$current_core" != "$core" ] || [ "$new_meta_version" != "$meta_version" ] || [ "$(core_binary_version /usr/libexec/mihomo)" != "$core_latest" ]; then
+elif [ "$current_core" != "$core" ] || [ "$new_meta_version" != "$meta_version" ] || [ "$(core_release_version /usr/libexec/mihomo)" != "$core_latest" ]; then
 	install_core "$core_release/$core_asset-$core_latest.gz"
 else
 	info "$(core_title "$core") $core_latest is already installed"
