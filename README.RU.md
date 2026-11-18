@@ -1,6 +1,7 @@
 ![GitHub License](https://img.shields.io/github/license/prettyleaf/openwrt-exodus?style=for-the-badge&logo=github)
 
 Русский | [English](README.md)
+[Документация](https://prettyleaf.github.io/OpenWrt-exodus/install/mikrotik/)
 
 # Exodus для MikroTik
 
@@ -75,7 +76,7 @@
 
 ### Обновления
 
-- **Код Exodus и ядро** обновляются на странице **«Обновления»** веб-интерфейса, прямо в работающем контейнере, как на Keenetic. Версия Exodus — версия [релизов](https://github.com/prettyleaf/openwrt-exodus/releases), одна на всех роутерах; обновление предлагается, когда меняется код ветки `mikrotik`.
+- **Код Exodus и ядро** обновляются на странице **«Обновления»** веб-интерфейса, прямо в работающем контейнере, как на Keenetic. Версия Exodus — версия [релизов](https://github.com/prettyleaf/openwrt-exodus/releases), одна на всех роутерах; обновление предлагается, когда меняется код ветки `mikrotik`. Если GitHub не отвечает контейнеру напрямую, обновление качается через публичные зеркала `gh-proxy.com` и `ghfast.top`, если не задан `exodusGhProxy`.
 - **Образ** (Alpine и его пакеты) обновляется установщиком: запустите его снова. Он пересоздаст контейнер из нового образа, настройки, профили и подписки в `<диск>/exodus/data` сохранятся.
 
 Ядро меняется и на странице **«Обновления»**: выберите Prizrak-Core, Mihomo Meta или Mihomo Alpha и нажмите **«Сменить ядро»** — поставится его последняя сборка, дальше обновляется оно. Установщик в оболочке контейнера тоже его меняет:
@@ -86,11 +87,13 @@
 
 ### Без доступа к ghcr.io
 
-Скачайте файл образа через gh-proxy и установите из него:
+Скачайте файл образа через свой [gh-proxy](https://github.com/prettyleaf/gh-proxy) или публичное зеркало `https://gh-proxy.com` и установите из него:
 
 ```routeros
-:global exodusFile "github"; :global exodusGhProxy "https://example.com/ghproxy/TOKEN"; /import exodus-install.rsc
+:global exodusFile "github"; :global exodusGhProxy "https://gh-proxy.com"; /import exodus-install.rsc
 ```
+
+С `exodusGhProxy` обновления внутри контейнера идут только через него.
 
 ## Использование
 

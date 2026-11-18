@@ -1,6 +1,7 @@
 ![GitHub License](https://img.shields.io/github/license/prettyleaf/openwrt-exodus?style=for-the-badge&logo=github)
 
 [Русский](README.RU.md) | English
+[Documentation](https://prettyleaf.github.io/OpenWrt-exodus/en/install/mikrotik/)
 
 # Exodus for MikroTik
 
@@ -75,7 +76,7 @@ Options are global variables set before the import:
 
 ### Updates
 
-- **The code of Exodus and the core** are updated on the **Updates** page of the web UI, inside the running container, like on Keenetic. The version of Exodus is the version of the [releases](https://github.com/prettyleaf/openwrt-exodus/releases), the same on every router; an update is offered when the code of the `mikrotik` branch changes.
+- **The code of Exodus and the core** are updated on the **Updates** page of the web UI, inside the running container, like on Keenetic. The version of Exodus is the version of the [releases](https://github.com/prettyleaf/openwrt-exodus/releases), the same on every router; an update is offered when the code of the `mikrotik` branch changes. When GitHub does not answer the container directly, the update downloads through the public mirrors `gh-proxy.com` and `ghfast.top`, unless `exodusGhProxy` is set.
 - **The image** (Alpine and its packages) is updated by the installer: run it again. It recreates the container from the new image, settings, profiles and subscriptions in `<disk>/exodus/data` are kept.
 
 The core is changed on the **Updates** page too: choose Prizrak-Core, Mihomo Meta or Mihomo Alpha and press **Change core**, its latest build is installed and the next updates follow it. The installer in the shell of the container changes it as well:
@@ -86,11 +87,13 @@ The core is changed on the **Updates** page too: choose Prizrak-Core, Mihomo Met
 
 ### Without access to ghcr.io
 
-Download the image file through gh-proxy and install from it:
+Download the image file through your [gh-proxy](https://github.com/prettyleaf/gh-proxy) or the public mirror `https://gh-proxy.com` and install from it:
 
 ```routeros
-:global exodusFile "github"; :global exodusGhProxy "https://example.com/ghproxy/TOKEN"; /import exodus-install.rsc
+:global exodusFile "github"; :global exodusGhProxy "https://gh-proxy.com"; /import exodus-install.rsc
 ```
+
+With `exodusGhProxy` the updates inside the container go only through it.
 
 ## How To Use
 
