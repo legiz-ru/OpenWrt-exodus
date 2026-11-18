@@ -5,6 +5,16 @@
   },
   "releases": [
     {
+      "version": "1.30.8",
+      "date": "2026-11-18",
+      "en": [
+        "When GitHub does not answer the router directly, the installer downloads through the public mirrors gh-proxy.com and ghfast.top before asking for a gh-proxy, and the mirror that worked is kept for the Updates page. It also tells why GitHub did not answer (DNS, connection, certificate and the clock of the router) instead of always calling it a block of the provider."
+      ],
+      "ru": [
+        "Если GitHub не отвечает роутеру напрямую, установщик качает через публичные зеркала gh-proxy.com и ghfast.top, прежде чем просить gh-proxy, а сработавшее зеркало сохраняется для страницы «Обновления». Ещё он пишет, почему GitHub не ответил (DNS, соединение, сертификат и часы роутера), а не всегда называет это блокировкой провайдера."
+      ]
+    },
+    {
       "version": "1.30.7",
       "date": "2026-11-18",
       "en": [
