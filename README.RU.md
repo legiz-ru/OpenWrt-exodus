@@ -46,6 +46,16 @@ curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/keenetic/
 curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/keenetic/install.sh | CORE=alpha PASSWORD=secret sh
 ```
 
+### Без доступа к GitHub
+
+Если GitHub не отвечает роутеру напрямую, установщик пишет причину (DNS, соединение, сертификат) и качает через публичные зеркала `gh-proxy.com` и `ghfast.top`; сработавшее зеркало сохраняется для страницы **«Обновления»**. Если не отвечают и они, установщик просит адрес своего [gh-proxy](https://github.com/prettyleaf/gh-proxy), его можно передать и заранее: `GH_PROXY=https://example.com/ghproxy/TOKEN`. `GH_PROXY=` снова качает только напрямую. Если не открывается `raw.githubusercontent.com`, возьмите установщик с jsDelivr:
+
+```shell
+curl -fsSL https://cdn.jsdelivr.net/gh/prettyleaf/openwrt-exodus@keenetic/install.sh | sh
+```
+
+Подробнее — в [документации](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#если-github-заблокирован).
+
 ### Версии
 
 У Exodus одна версия для всех роутеров — версия [релизов](https://github.com/prettyleaf/openwrt-exodus/releases) проекта: она в `/opt/share/exodus/VERSION`, на странице **«Обновления»** и в информации о сборке. Страница **«Обновления»** предлагает обновление, когда меняется код ветки `keenetic`, изменения README не считаются. Там же меняется ядро: выберите Prizrak-Core, Mihomo Meta или Mihomo Alpha и нажмите **«Сменить ядро»** — поставится его последняя сборка, дальше обновляется оно.
