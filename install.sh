@@ -65,11 +65,49 @@ gh_url() {
 	echo "${gh_proxy:+$gh_proxy/}$1"
 }
 
+# download a file of a github release by the route of the access check
+# $1 url of the file, $2 output file or - for stdout, the rest are options of wget
+# when github.com does not answer but api.github.com does, the file is taken by its id in the release metadata of the api,
+# the api redirects it to release-assets.githubusercontent.com
+download_github() {
+	local url="$1" output="$2" path repo release asset metadata asset_id
+	shift 2
+	if [ "$use_github_api" != 1 ]; then
+		wget "$@" -O "$output" "$(gh_url "$url")"
+		return
+	fi
+	path="${url#https://github.com/}"
+	repo="${path%%/releases/*}"
+	release="${path#*/releases/}"
+	asset="${release##*/}"
+	case "$release" in
+		latest/download/*) release="latest" ;;
+		download/*/*)
+			release="${release#download/}"
+			release="tags/${release%/*}"
+			;;
+		*) return 1 ;;
+	esac
+	# the name goes into the filter of jsonfilter
+	case "$asset" in ""|*[!A-Za-z0-9._-]*) return 1 ;; esac
+	# the metadata is kept for the run: the index and the archive come from the same release even if latest changes meanwhile
+	metadata="$temp_dir/api-$(echo "$repo/$release" | tr '/' '_').json"
+	if [ ! -s "$metadata" ] && ! wget -q -T 15 -O "$metadata" "https://api.github.com/repos/$repo/releases/$release"; then
+		rm -f "$metadata"
+		return 4
+	fi
+	asset_id=$(jsonfilter -q -i "$metadata" -e "@.assets[@.name=\"$asset\"].id")
+	# a file missing in the release, like a 404 of github
+	case "$asset_id" in ""|*[!0-9]*) return 8 ;; esac
+	# quiet: the redirect prints a signed temporary address
+	wget -q "$@" --header 'Accept: application/octet-stream' -O "$output" "https://api.github.com/repos/$repo/releases/assets/$asset_id"
+}
+
 # fetch the package index of the release to check access to github
 # returns 0 on success, 8 if github answered with an error (the file is missing), other codes if github is unreachable
 check_github() {
 	local index ret
-	index=$(wget -T 15 -O - "$(gh_url "$index_url")" 2> /tmp/exodus-github.err)
+	index=$(download_github "$index_url" - -T 15 2> /tmp/exodus-github.err)
 	ret=$?
 	# a wrong gh-proxy address may answer with some web page
 	if [ "$ret" = 0 ] && ! echo "$index" | grep -q '"packages"'; then
@@ -81,6 +119,26 @@ check_github() {
 	rm -f /tmp/exodus-github.err
 	# older releases have no tag in the index
 	release_tag=$(echo "$index" | jsonfilter -q -e '@.tag' 2> /dev/null)
+	return "$ret"
+}
+
+# check github directly, then through its api when github.com does not answer
+# direct_error keeps the reason of the failed direct check
+check_direct_github() {
+	local ret
+	gh_proxy=""
+	use_github_api=0
+	check_github
+	ret=$?
+	# on success the last line of wget is its progress, not an error
+	direct_error=""
+	[ "$ret" = 0 ] || direct_error="$check_error"
+	# 8 is an answer of github, the api would not find the file either
+	if [ "$ret" != 0 ] && [ "$ret" != 8 ]; then
+		use_github_api=1
+		check_github && return 0
+		use_github_api=0
+	fi
 	return "$ret"
 }
 
@@ -141,7 +199,7 @@ core_menu() {
 install_core() {
 	local file="$temp_dir/core.gz"
 	info "download ${1##*/}"
-	if ! wget -q -O "$file" "$(gh_url "$1")" || ! gzip -t "$file" 2> /dev/null; then
+	if ! download_github "$1" "$file" -q || ! gzip -t "$file" 2> /dev/null; then
 		fail "core download failed"
 	fi
 	if [ "$LOW_SPACE" = 1 ]; then
@@ -293,7 +351,7 @@ mkdir -p "$temp_dir"
 # a proxy stopped for the downloads is started again if the installer fails
 trap 'rm -rf "$temp_dir"; [ "$proxy_stopped" = 1 ] && [ -x "/etc/init.d/nikki" ] && /etc/init.d/nikki start' EXIT
 
-# access to github: through the given or the saved gh-proxy, then directly, then through public mirrors
+# access to github: through the given or the saved gh-proxy, then directly or through the api of github, then through public mirrors
 # public gh-proxy mirrors, tried when github does not answer directly
 public_mirrors="https://gh-proxy.com https://ghfast.top"
 saved_gh_proxy=$(uci -q get nikki.update.gh_proxy)
@@ -309,12 +367,15 @@ else
 fi
 step "Checking access to GitHub"
 github_status=1
+use_github_api=0
 for route in $routes; do
-	gh_proxy="${route%/}"
-	[ "$route" = "direct" ] && gh_proxy=""
-	check_github
+	if [ "$route" = "direct" ]; then
+		check_direct_github
+	else
+		gh_proxy="${route%/}"
+		check_github
+	fi
 	status=$?
-	[ "$route" = "direct" ] && direct_error="$check_error"
 	if [ "$status" = 0 ]; then
 		github_status=0
 		break
@@ -342,8 +403,7 @@ if [ "$github_status" = 1 ] && [ -z "$GH_PROXY" ] && [ -x "/etc/init.d/nikki" ] 
 	warn "github is unreachable through the running proxy, stopping it and trying directly"
 	/etc/init.d/nikki stop
 	proxy_stopped=1
-	gh_proxy=""
-	check_github
+	check_direct_github
 	github_status=$?
 	[ "$github_status" = 0 ] || [ "$github_status" = 8 ] || github_status=1
 fi
@@ -382,7 +442,9 @@ if [ "$github_status" != 0 ]; then
 	done
 	[ "$github_status" = 0 ] || fail "github is unreachable"
 fi
-if [ -n "$gh_proxy" ]; then
+if [ "$use_github_api" = 1 ]; then
+	info "through the GitHub API${release_tag:+, release $release_tag}"
+elif [ -n "$gh_proxy" ]; then
 	# the token is a part of the address, only the host is shown
 	gh_proxy_host="${gh_proxy#*://}"
 	info "through gh-proxy at ${gh_proxy_host%%/*}${release_tag:+, release $release_tag}"
@@ -445,7 +507,7 @@ if [ "$core" != "meta" ]; then
 			[ "$core" = "prizrak-kroha-upx" ] && core_asset="$core_asset-compressed"
 			;;
 	esac
-	core_latest=$(wget -q -T 15 -O - "$(gh_url "$core_release/version.txt")" 2> /dev/null | head -n 1)
+	core_latest=$(download_github "$core_release/version.txt" - -q -T 15 2> /dev/null | head -n 1)
 	if ! echo "$core_latest" | grep -q -E '^[A-Za-z0-9._-]+$'; then
 		fail "failed to get the latest version of $(core_title "$core") from $core_release"
 	fi
@@ -467,7 +529,7 @@ fi
 
 # download and extract packages, streamed to avoid keeping the archive in ram
 info "download ${archive_url##*/}"
-wget -q -O - "$(gh_url "$archive_url")" | tar -x -z -f - -C "$temp_dir"
+download_github "$archive_url" - -q | tar -x -z -f - -C "$temp_dir"
 if ! ls "$temp_dir"/exodus[_-][0-9]* > /dev/null 2>&1; then
 	fail "download failed, if the provider slows down GitHub, install through gh-proxy, see README"
 fi
