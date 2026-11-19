@@ -56,7 +56,7 @@ In a terminal the installer asks for the core, Enter keeps the current one. `COR
 | Prizrak-Kroha | `prizrak-kroha` | the lighter build of Prizrak-Core from the same release for routers with little flash: about 35–40 MB on flash. OpenWrt only: amd64, arm64, armv7, mips, mipsle |
 | Prizrak-Kroha UPX | `prizrak-kroha-upx` | the same build packed with UPX: about 8–10 MB on flash, unpacked into RAM when it starts |
 
-The core is downloaded from its GitHub releases for the architecture of the router, the next runs of the installer and the update page update it to the latest build. On OpenWrt Mihomo Meta is installed as the `mihomo-meta` package verified by sha256, Alpha, Prizrak-Core and Prizrak-Kroha replace its binary while the package stays installed as a dependency. Choosing Mihomo Meta again brings back the stable core of that package version.
+The core is downloaded from its GitHub releases for the architecture of the router, the next runs of the installer and the update page update it to the latest build. Only the chosen core is written to flash: on OpenWrt since 1.31.0 no package carries it, Mihomo Meta is downloaded like the others, from the latest stable release. The `mihomo-meta` package of older versions is removed by the installer, its core stays and is updated.
 
 ## If GitHub is blocked
 
