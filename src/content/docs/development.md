@@ -7,7 +7,7 @@ description: Релизы, версии, сборка пакетов OpenWrt и 
 
 | Ветка | Что в ней |
 | --- | --- |
-| `main` | OpenWrt: пакеты `exodus`, `luci-app-exodus`, `mihomo-meta` и установщик |
+| `main` | OpenWrt: пакеты `exodus` и `luci-app-exodus` и установщик |
 | `keenetic` | Keenetic / Netcraze: Entware-версия и её установщик |
 | `asuswrt` | Asuswrt-Merlin: Entware-версия и её установщик |
 | `mikrotik` | MikroTik: контейнер RouterOS, его образ, `install.rsc` и `uninstall.rsc` |
@@ -28,7 +28,7 @@ description: Релизы, версии, сборка пакетов OpenWrt и 
 
 До 1.27.0 у `exodus` были версии-даты (`2026.04.08`), для пакетных менеджеров они выше 1.27.0: установщик ставит пакеты релиза с `opkg install --force-downgrade`, `apk add` ставит переданные файлы как есть.
 
-Ядро Mihomo не компилируется: `mihomo-meta` скачивает официальный бинарник под целевую архитектуру и проверяет его sha256. Workflow `dependabot` ежедневно проверяет релизы MetaCubeX и открывает pull request с новой версией и хешами в `mihomo-meta/Makefile`.
+Ядро Mihomo не компилируется и не входит в пакеты релизов: выбранное ядро скачивает установщик из его релизов на GitHub. `mihomo-meta` остаётся для сборки из фида: он скачивает официальный бинарник под целевую архитектуру и проверяет его sha256. Workflow `dependabot` ежедневно проверяет релизы MetaCubeX и открывает pull request с новой версией и хешами в `mihomo-meta/Makefile`.
 
 ## Сборка из исходников
 

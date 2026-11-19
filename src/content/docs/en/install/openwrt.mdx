@@ -44,16 +44,18 @@ The pages in detail — [LuCI](/en/usage/luci/).
 
 ## Installing without access to GitHub
 
-When GitHub does not answer the router, the installer downloads through the GitHub API itself when only `github.com` is blocked, then through public mirrors, and when they do not answer either, through your [gh-proxy](/en/install/options/#if-github-is-blocked). Without it, download `exodus_<arch>-<branch>.tar.gz` for your router from the [releases page](https://github.com/prettyleaf/openwrt-exodus/releases) on another machine, copy it to `/tmp` on the router and install the packages from it (only the Mihomo Meta core):
+When GitHub does not answer the router, the installer downloads through the GitHub API itself when only `github.com` is blocked, then through public mirrors, and when they do not answer either, through your [gh-proxy](/en/install/options/#if-github-is-blocked). Without it, download `exodus_<arch>-<branch>.tar.gz` for your router from the [releases page](https://github.com/prettyleaf/openwrt-exodus/releases) on another machine, and the core `mihomo-linux-<core>-v<version>.gz` from [Mihomo Meta releases](https://github.com/MetaCubeX/mihomo/releases/latest) (`<core>`: `arm64` for `aarch64_*`, `armv7` for `arm_*` with neon or vfp, `mipsle-softfloat` for `mipsel_*`, `mips-softfloat` for `mips_*`, `amd64-v1` for `x86_64`), copy both to `/tmp` on the router and install:
 
 ```shell
 # <arch> is DISTRIB_ARCH from /etc/openwrt_release, <branch> is openwrt-24.10, openwrt-25.12 or SNAPSHOT
 # if nikki is installed, remove it first (the config is kept): opkg remove luci-app-nikki nikki / apk del luci-app-nikki nikki
 mkdir -p /tmp/exodus && tar -x -z -f /tmp/exodus_<arch>-<branch>.tar.gz -C /tmp/exodus
 # opkg (OpenWrt 24.10); --force-downgrade replaces exodus versioned by date (2026.04.08) or a newer release
-opkg update && opkg install --force-downgrade /tmp/exodus/mihomo-meta_*.ipk /tmp/exodus/exodus_*.ipk /tmp/exodus/luci-app-exodus_*.ipk
+opkg update && opkg install --force-downgrade /tmp/exodus/exodus_*.ipk /tmp/exodus/luci-app-exodus_*.ipk
 # apk (OpenWrt 25.12 and SNAPSHOT)
-apk update && apk add --allow-untrusted /tmp/exodus/mihomo-meta-[0-9]*.apk /tmp/exodus/exodus-[0-9]*.apk /tmp/exodus/luci-app-exodus-[0-9]*.apk
+apk update && apk add --allow-untrusted /tmp/exodus/exodus-[0-9]*.apk /tmp/exodus/luci-app-exodus-[0-9]*.apk
+# the core, the packages do not carry it
+gzip -dc /tmp/mihomo-linux-*.gz > /usr/libexec/mihomo && chmod 755 /usr/libexec/mihomo && /usr/libexec/mihomo -v
 ```
 
 ## Uninstall

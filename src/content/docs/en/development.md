@@ -7,7 +7,7 @@ description: Releases, versions, building the OpenWrt packages and this document
 
 | Branch | What is in it |
 | --- | --- |
-| `main` | OpenWrt: the `exodus`, `luci-app-exodus`, `mihomo-meta` packages and the installer |
+| `main` | OpenWrt: the `exodus` and `luci-app-exodus` packages and the installer |
 | `keenetic` | Keenetic / Netcraze: the Entware version and its installer |
 | `asuswrt` | Asuswrt-Merlin: the Entware version and its installer |
 | `mikrotik` | MikroTik: the container of RouterOS, its image, `install.rsc` and `uninstall.rsc` |
@@ -28,7 +28,7 @@ The Keenetic, Asuswrt-Merlin and MikroTik branches are installed from the branch
 
 Before 1.27.0 `exodus` had versions by date (`2026.04.08`), they are higher than 1.27.0 for the package managers: the installer installs the packages of the release with `opkg install --force-downgrade`, `apk add` installs the given files as they are.
 
-The Mihomo core is not compiled: `mihomo-meta` downloads the official binary for the target architecture and checks its sha256. The `dependabot` workflow checks MetaCubeX releases daily and opens a pull request that bumps the version and the hashes in `mihomo-meta/Makefile`.
+The Mihomo core is not compiled and not packaged in the releases: the installer downloads the chosen core from its GitHub releases. `mihomo-meta` stays for builds from the feed: it downloads the official binary for the target architecture and checks its sha256. The `dependabot` workflow checks MetaCubeX releases daily and opens a pull request that bumps the version and the hashes in `mihomo-meta/Makefile`.
 
 ## Building from source
 

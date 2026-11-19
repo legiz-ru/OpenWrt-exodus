@@ -44,16 +44,18 @@ wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/insta
 
 ## Установка без доступа к GitHub
 
-Если GitHub не отвечает роутеру, установщик сам качает через GitHub API, если заблокирован только `github.com`, затем через публичные зеркала, а если не отвечают и они — через ваш [gh-proxy](/install/options/#если-github-заблокирован). Без него скачайте `exodus_<arch>-<branch>.tar.gz` для своего роутера со [страницы релизов](https://github.com/prettyleaf/openwrt-exodus/releases) на другом компьютере, скопируйте в `/tmp` роутера и поставьте пакеты из архива (только ядро Mihomo Meta):
+Если GitHub не отвечает роутеру, установщик сам качает через GitHub API, если заблокирован только `github.com`, затем через публичные зеркала, а если не отвечают и они — через ваш [gh-proxy](/install/options/#если-github-заблокирован). Без него скачайте `exodus_<arch>-<branch>.tar.gz` для своего роутера со [страницы релизов](https://github.com/prettyleaf/openwrt-exodus/releases) на другом компьютере, и ядро `mihomo-linux-<ядро>-v<версия>.gz` из [релизов Mihomo Meta](https://github.com/MetaCubeX/mihomo/releases/latest) (`<ядро>`: `arm64` для `aarch64_*`, `armv7` для `arm_*` с neon или vfp, `mipsle-softfloat` для `mipsel_*`, `mips-softfloat` для `mips_*`, `amd64-v1` для `x86_64`), скопируйте оба файла в `/tmp` роутера и поставьте:
 
 ```shell
 # <arch> — DISTRIB_ARCH из /etc/openwrt_release, <branch> — openwrt-24.10, openwrt-25.12 или SNAPSHOT
 # если стоит nikki, сначала удалите его (настройки сохранятся): opkg remove luci-app-nikki nikki / apk del luci-app-nikki nikki
 mkdir -p /tmp/exodus && tar -x -z -f /tmp/exodus_<arch>-<branch>.tar.gz -C /tmp/exodus
 # opkg (OpenWrt 24.10); --force-downgrade заменяет exodus с версией-датой (2026.04.08) или более новый релиз
-opkg update && opkg install --force-downgrade /tmp/exodus/mihomo-meta_*.ipk /tmp/exodus/exodus_*.ipk /tmp/exodus/luci-app-exodus_*.ipk
+opkg update && opkg install --force-downgrade /tmp/exodus/exodus_*.ipk /tmp/exodus/luci-app-exodus_*.ipk
 # apk (OpenWrt 25.12 и SNAPSHOT)
-apk update && apk add --allow-untrusted /tmp/exodus/mihomo-meta-[0-9]*.apk /tmp/exodus/exodus-[0-9]*.apk /tmp/exodus/luci-app-exodus-[0-9]*.apk
+apk update && apk add --allow-untrusted /tmp/exodus/exodus-[0-9]*.apk /tmp/exodus/luci-app-exodus-[0-9]*.apk
+# ядро, в пакетах его нет
+gzip -dc /tmp/mihomo-linux-*.gz > /usr/libexec/mihomo && chmod 755 /usr/libexec/mihomo && /usr/libexec/mihomo -v
 ```
 
 ## Удаление
