@@ -1,6 +1,6 @@
 ![GitHub License](https://img.shields.io/github/license/prettyleaf/openwrt-exodus?style=for-the-badge&logo=github) ![GitHub Tag](https://img.shields.io/github/v/release/prettyleaf/openwrt-exodus?style=for-the-badge&logo=github) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/prettyleaf/openwrt-exodus/total?style=for-the-badge&logo=github)
 
-English | [中文](README.zh.md)  
+[Русский](README.RU.md) | English  
 [Documentation](https://prettyleaf.github.io/OpenWrt-exodus/en/)
 
 > [!CAUTION]
