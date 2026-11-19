@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/asuswrt/i
 
 | Переменная | Платформы | Значение |
 | --- | --- | --- |
-| `CORE` | все | `meta`, `alpha` или `prizrak` — поставить это [ядро](#ядро) без вопроса |
+| `CORE` | все | `meta`, `alpha`, `prizrak`, `prizrak-kroha` или `prizrak-kroha-upx` (два последних — только OpenWrt) — поставить это [ядро](#ядро) без вопроса |
 | `GH_PROXY` | все | адрес [gh-proxy](#если-github-заблокирован) с токеном, например `https://example.com/ghproxy/TOKEN`; `GH_PROXY=` — скачивать только напрямую, без публичных зеркал |
 | `LOW_SPACE=1` | все | удалить текущее ядро перед установкой нового, если на накопителе мало места |
 | `VERSION` | OpenWrt | релиз вместо последнего, например `v1.30.7` |
@@ -53,8 +53,10 @@ curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/asuswrt/i
 | Mihomo Meta | `meta` | последний стабильный релиз [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo/releases) |
 | Mihomo Alpha | `alpha` | последняя сборка для разработки, [Prerelease-Alpha](https://github.com/MetaCubeX/mihomo/releases/tag/Prerelease-Alpha) |
 | Prizrak-Core | `prizrak` | последний релиз [legiz-ru/Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core/releases), форка mihomo, по умолчанию при новой установке |
+| Prizrak-Kroha | `prizrak-kroha` | облегчённая сборка Prizrak-Core из того же релиза для роутеров с малым флешем: ≈ 35–40 МБ на флеше. Только OpenWrt: amd64, arm64, armv7, mips, mipsle |
+| Prizrak-Kroha UPX | `prizrak-kroha-upx` | та же сборка, сжатая UPX: ≈ 8–10 МБ на флеше, при запуске распаковывается в оперативную память |
 
-Ядро скачивается из релизов на GitHub под архитектуру роутера, повторный запуск установщика и страница обновлений обновляют его до последней сборки. На OpenWrt Mihomo Meta ставится пакетом `mihomo-meta` с проверкой sha256, а Alpha и Prizrak-Core заменяют его бинарник; пакет остаётся как зависимость. Повторный выбор Mihomo Meta возвращает стабильное ядро версии этого пакета.
+Ядро скачивается из релизов на GitHub под архитектуру роутера, повторный запуск установщика и страница обновлений обновляют его до последней сборки. На OpenWrt Mihomo Meta ставится пакетом `mihomo-meta` с проверкой sha256, а Alpha, Prizrak-Core и Prizrak-Kroha заменяют его бинарник; пакет остаётся как зависимость. Повторный выбор Mihomo Meta возвращает стабильное ядро версии этого пакета.
 
 ## Если GitHub заблокирован
 

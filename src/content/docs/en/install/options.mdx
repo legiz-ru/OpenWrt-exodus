@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/asuswrt/i
 
 | Variable | Platforms | Meaning |
 | --- | --- | --- |
-| `CORE` | all | `meta`, `alpha` or `prizrak` — install this [core](#core) without asking |
+| `CORE` | all | `meta`, `alpha`, `prizrak`, `prizrak-kroha` or `prizrak-kroha-upx` (the last two on OpenWrt only) — install this [core](#core) without asking |
 | `GH_PROXY` | all | address of [gh-proxy](#if-github-is-blocked) with the token, e.g. `https://example.com/ghproxy/TOKEN`; `GH_PROXY=` downloads only directly, without the public mirrors |
 | `LOW_SPACE=1` | all | remove the current core before installing the new one when there is little free space |
 | `VERSION` | OpenWrt | a release instead of the latest one, e.g. `v1.30.7` |
@@ -53,8 +53,10 @@ In a terminal the installer asks for the core, Enter keeps the current one. `COR
 | Mihomo Meta | `meta` | the latest stable release of [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo/releases) |
 | Mihomo Alpha | `alpha` | the latest development build, [Prerelease-Alpha](https://github.com/MetaCubeX/mihomo/releases/tag/Prerelease-Alpha) |
 | Prizrak-Core | `prizrak` | the latest release of [legiz-ru/Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core/releases), a fork of mihomo, the default on a new install |
+| Prizrak-Kroha | `prizrak-kroha` | the lighter build of Prizrak-Core from the same release for routers with little flash: about 35–40 MB on flash. OpenWrt only: amd64, arm64, armv7, mips, mipsle |
+| Prizrak-Kroha UPX | `prizrak-kroha-upx` | the same build packed with UPX: about 8–10 MB on flash, unpacked into RAM when it starts |
 
-The core is downloaded from its GitHub releases for the architecture of the router, the next runs of the installer and the update page update it to the latest build. On OpenWrt Mihomo Meta is installed as the `mihomo-meta` package verified by sha256, Alpha and Prizrak-Core replace its binary while the package stays installed as a dependency. Choosing Mihomo Meta again brings back the stable core of that package version.
+The core is downloaded from its GitHub releases for the architecture of the router, the next runs of the installer and the update page update it to the latest build. On OpenWrt Mihomo Meta is installed as the `mihomo-meta` package verified by sha256, Alpha, Prizrak-Core and Prizrak-Kroha replace its binary while the package stays installed as a dependency. Choosing Mihomo Meta again brings back the stable core of that package version.
 
 ## If GitHub is blocked
 
