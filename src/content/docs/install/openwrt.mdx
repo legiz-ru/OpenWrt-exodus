@@ -44,7 +44,7 @@ wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/insta
 
 ## Установка без доступа к GitHub
 
-Если GitHub не отвечает роутеру, установщик сам качает через публичные зеркала, а если не отвечают и они — через ваш [gh-proxy](/install/options/#если-github-заблокирован). Без него скачайте `exodus_<arch>-<branch>.tar.gz` для своего роутера со [страницы релизов](https://github.com/prettyleaf/openwrt-exodus/releases) на другом компьютере, скопируйте в `/tmp` роутера и поставьте пакеты из архива (только ядро Mihomo Meta):
+Если GitHub не отвечает роутеру, установщик сам качает через GitHub API, если заблокирован только `github.com`, затем через публичные зеркала, а если не отвечают и они — через ваш [gh-proxy](/install/options/#если-github-заблокирован). Без него скачайте `exodus_<arch>-<branch>.tar.gz` для своего роутера со [страницы релизов](https://github.com/prettyleaf/openwrt-exodus/releases) на другом компьютере, скопируйте в `/tmp` роутера и поставьте пакеты из архива (только ядро Mihomo Meta):
 
 ```shell
 # <arch> — DISTRIB_ARCH из /etc/openwrt_release, <branch> — openwrt-24.10, openwrt-25.12 или SNAPSHOT

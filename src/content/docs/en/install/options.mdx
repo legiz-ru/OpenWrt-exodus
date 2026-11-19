@@ -64,9 +64,10 @@ The installer first checks access to GitHub and tries the routes in turn:
 
 1. the saved gh-proxy, if there is one;
 2. directly. When GitHub does not answer, the installer prints the reason, for example `github does not answer directly: curl: (6) Could not resolve host`, see [troubleshooting](/en/troubleshooting/#the-installer-says-github-is-unreachable) for what it means;
-3. the public mirrors `gh-proxy.com` and `ghfast.top`. The mirror that worked is saved like your own gh-proxy, the update page downloads through it.
+3. on OpenWrt, through the GitHub API, when only `github.com` is blocked and `api.github.com` and `release-assets.githubusercontent.com` answer. The installer takes the metadata of the release from the API and downloads the files by their ids, nothing to set up, the output says `through the GitHub API`;
+4. the public mirrors `gh-proxy.com` and `ghfast.top`. The mirror that worked is saved like your own gh-proxy, the update page downloads through it.
 
-A public mirror could change the files it serves and nothing checks them: with a server of your own, prefer your own gh-proxy. `GH_PROXY=` makes the installer download only directly again, `GH_PROXY=<address>` only through that address.
+A public mirror could change the files it serves and nothing checks them: with a server of your own, prefer your own gh-proxy. `GH_PROXY=` makes the installer download only directly again (on OpenWrt also through the GitHub API), `GH_PROXY=<address>` only through that address.
 
 When the mirrors do not answer either, the installer checks [jsDelivr](https://www.jsdelivr.com/): if jsDelivr is reachable, GitHub is blocked by the provider; if not, the router probably has no internet or DNS. jsDelivr serves files of the repository, but not release files, so the packages and the core come only from GitHub.
 
