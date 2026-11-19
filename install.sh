@@ -626,6 +626,8 @@ if [ "$current_core" != "$core" ] || [ "$(core_release_version /usr/libexec/miho
 else
 	info "$(core_title "$core") $core_latest is already installed"
 fi
+# mihomo in PATH, like the link of mihomo-meta: apk points it at busybox when that package goes, a file of another package stays
+[ -L "/usr/bin/mihomo" ] || [ ! -e "/usr/bin/mihomo" ] && ln -sf "/usr/libexec/mihomo" "/usr/bin/mihomo"
 
 # remember the core and the gh-proxy for the next runs and the update page
 uci -q set nikki.update=update

@@ -13,12 +13,14 @@ if [ -x "/bin/opkg" ]; then
 elif [ -x "/usr/bin/apk" ]; then
 	apk list --installed --manifest 'luci-i18n-exodus-*' | cut -d ' ' -f 1 | xargs apk del
 	apk list --installed --manifest 'luci-i18n-nikki-*' | cut -d ' ' -f 1 | xargs apk del
-	apk del luci-app-exodus luci-app-nikki
-	apk del exodus nikki
-	apk del mihomo-meta mihomo-alpha
+	# apk refuses the whole list when one of its packages is not installed, one by one
+	for package in luci-app-exodus luci-app-nikki exodus nikki mihomo-meta mihomo-alpha; do
+		apk del "$package" 2> /dev/null
+	done
 fi
 # remove the core, since 1.31.0 it belongs to no package
 rm -f /usr/libexec/mihomo
+[ -L /usr/bin/mihomo ] && rm -f /usr/bin/mihomo
 # remove config
 rm -f /etc/config/nikki
 # remove files
