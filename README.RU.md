@@ -23,7 +23,7 @@
 - Прозрачный прокси (Redirect/TPROXY/TUN, IPv4 и/или IPv6), по умолчанию TCP Redirect + UDP TPROXY
 - Официальное ядро Mihomo: `mihomo-meta` упаковывает готовый бинарник из [релизов MetaCubeX](https://github.com/MetaCubeX/mihomo/releases) с проверкой sha256
 - Выбор ядра в установщике и на странице обновлений: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), стабильный Mihomo Meta, Mihomo Alpha или Prizrak-Kroha — облегчённая сборка Prizrak-Core для роутеров с малым флешем (amd64, arm64, armv7, mips и mipsle; `prizrak-kroha-upx` — та же сборка, сжатая UPX)
-- Установка, даже если GitHub не отвечает роутеру: через публичные зеркала `gh-proxy.com` и `ghfast.top` или свой [gh-proxy](https://github.com/prettyleaf/gh-proxy)
+- Установка, даже если GitHub не отвечает роутеру: через GitHub API, публичные зеркала `gh-proxy.com` и `ghfast.top` или свой [gh-proxy](https://github.com/prettyleaf/gh-proxy)
 - Выбор устройств для прокси: проксировать всех, кроме выбранных, или только выбранные устройства
 - Заголовки HWID для подписок, включены по умолчанию
 - Заголовки провайдера подписки: `profile-title` задаёт название подписки, `announce` и `support-url` показываются на странице статуса, `profile-logo` — рядом с подпиской
@@ -40,7 +40,7 @@
 wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | ash
 ```
 
-Сначала установщик проверяет, может ли роутер скачивать с GitHub. Если GitHub напрямую не отвечает, он показывает причину и скачивает через публичные зеркала `gh-proxy.com` и `ghfast.top`, затем спрашивает адрес своего [gh-proxy](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#если-github-заблокирован). Потом спрашивает, какое [ядро](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#ядро) поставить. Настройки для запуска [можно передать](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#переменные) переменными окружения перед `ash`.
+Сначала установщик проверяет, может ли роутер скачивать с GitHub. Если GitHub напрямую не отвечает, он показывает причину и скачивает через GitHub API (`api.github.com`, если заблокирован только `github.com`), затем через публичные зеркала `gh-proxy.com` и `ghfast.top`, затем спрашивает адрес своего [gh-proxy](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#если-github-заблокирован). Потом спрашивает, какое [ядро](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#ядро) поставить. Настройки для запуска [можно передать](https://prettyleaf.github.io/OpenWrt-exodus/install/options/#переменные) переменными окружения перед `ash`.
 
 ```shell
 wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.30.7 CORE=alpha ash

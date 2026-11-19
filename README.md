@@ -23,7 +23,7 @@ Other routers have their own branches: [Keenetic / Netcraze](https://github.com/
 - Transparent Proxy (Redirect/TPROXY/TUN, IPv4 and/or IPv6), TCP Redirect + UDP TPROXY by default
 - Official Mihomo core: `mihomo-meta` packages the prebuilt binary from [MetaCubeX releases](https://github.com/MetaCubeX/mihomo/releases), verified by sha256
 - Choice of the core in the installer and on the update page: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), stable Mihomo Meta, Mihomo Alpha or Prizrak-Kroha, the lighter build of Prizrak-Core for routers with little flash (amd64, arm64, armv7, mips and mipsle; `prizrak-kroha-upx` is the same build packed with UPX)
-- Installation when GitHub does not answer the router: through the public mirrors `gh-proxy.com` and `ghfast.top` or your own [gh-proxy](https://github.com/prettyleaf/gh-proxy)
+- Installation when GitHub does not answer the router: through the GitHub API, the public mirrors `gh-proxy.com` and `ghfast.top` or your own [gh-proxy](https://github.com/prettyleaf/gh-proxy)
 - Per-device proxy selection: proxy everyone except the selected devices, or only the selected devices
 - HWID headers for subscriptions, enabled by default
 - Provider headers of subscriptions: `profile-title` names the subscription, `announce` and `support-url` are shown on the status page, `profile-logo` next to the subscription
@@ -40,7 +40,7 @@ The packages are `exodus`, `luci-app-exodus` and `luci-i18n-exodus-*`. If `nikki
 wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | ash
 ```
 
-The installer first checks that the router can download from GitHub. When GitHub does not answer directly, it prints the reason and downloads through the public mirrors `gh-proxy.com` and `ghfast.top`, then asks for your own [gh-proxy](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#if-github-is-blocked). Then it asks which [core](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#core) to install. Settings for a run [can be](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#variables) passed as environment variables before `ash`.
+The installer first checks that the router can download from GitHub. When GitHub does not answer directly, it prints the reason and downloads through the GitHub API (`api.github.com`, when only `github.com` is blocked), then through the public mirrors `gh-proxy.com` and `ghfast.top`, then asks for your own [gh-proxy](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#if-github-is-blocked). Then it asks which [core](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#core) to install. Settings for a run [can be](https://prettyleaf.github.io/OpenWrt-exodus/en/install/options/#variables) passed as environment variables before `ash`.
 
 ```shell
 wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/install.sh | VERSION=v1.30.7 CORE=alpha ash
