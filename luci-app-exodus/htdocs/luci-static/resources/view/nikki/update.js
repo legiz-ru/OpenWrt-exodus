@@ -54,12 +54,8 @@ return view.extend({
             row(`${_('App')} (luci-app-exodus)`, installed['luci-app-exodus'], latest['luci-app-exodus']),
             row(`${_('Service')} (exodus)`, installed['exodus'], latest['exodus']),
         ];
-        // an alternative core replaces the binary of mihomo-meta, the installer keeps the package only as a dependency
-        if (core.type !== 'meta' && coreTitles[core.type]) {
-            rows.push(row(`${_('Core')} (${coreTitles[core.type]})`, core.installed, core.latest));
-        } else {
-            rows.push(row(`${_('Core')} (mihomo-meta)`, installed['mihomo-meta'], latest['mihomo-meta']));
-        }
+        // the installer downloads every core from its releases, no package carries it
+        rows.push(row(`${_('Core')} (${coreTitles[currentCore]})`, core.installed, core.latest));
 
         // the panel is updated apart, by the running core: its own button in the row, the update of the packages does not wait for it
         const dashboard = info.dashboard;
@@ -104,9 +100,6 @@ return view.extend({
         const notes = [];
         if (info.error) {
             notes.push(E('div', { class: 'alert-message warning' }, `${_('Failed to check for updates:')} ${info.error}`));
-        }
-        if (installed['mihomo-alpha'] != null) {
-            notes.push(E('div', { class: 'alert-message warning' }, _('mihomo-alpha is installed, it will be replaced by mihomo-meta.')));
         }
 
         // suggest low space mode when the new core may not fit next to the current one

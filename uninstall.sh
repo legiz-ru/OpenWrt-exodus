@@ -17,6 +17,8 @@ elif [ -x "/usr/bin/apk" ]; then
 	apk del exodus nikki
 	apk del mihomo-meta mihomo-alpha
 fi
+# remove the core, since 1.31.0 it belongs to no package
+rm -f /usr/libexec/mihomo
 # remove config
 rm -f /etc/config/nikki
 # remove files
