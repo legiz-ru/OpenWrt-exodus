@@ -21,7 +21,7 @@ Other routers have their own branches: [Keenetic / Netcraze](https://github.com/
 ## Feature
 
 - Transparent Proxy (Redirect/TPROXY/TUN, IPv4 and/or IPv6), TCP Redirect + UDP TPROXY by default
-- Official Mihomo core: `mihomo-meta` packages the prebuilt binary from [MetaCubeX releases](https://github.com/MetaCubeX/mihomo/releases), verified by sha256
+- The core is downloaded by the installer from its GitHub releases for the architecture of the router, no package carries it: only the chosen core takes flash
 - Choice of the core in the installer and on the update page: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), stable Mihomo Meta, Mihomo Alpha or Prizrak-Kroha, the lighter build of Prizrak-Core for routers with little flash (amd64, arm64, armv7, mips and mipsle; `prizrak-kroha-upx` is the same build packed with UPX)
 - Installation when GitHub does not answer the router: through the GitHub API, the public mirrors `gh-proxy.com` and `ghfast.top` or your own [gh-proxy](https://github.com/prettyleaf/gh-proxy)
 - Per-device proxy selection: proxy everyone except the selected devices, or only the selected devices
@@ -50,7 +50,7 @@ Installed packages can also be updated from LuCI: `Services → Exodus → Updat
 
 ### Versions
 
-Exodus has one version for all routers, the version of the [release](https://github.com/prettyleaf/openwrt-exodus/releases): the tag `v1.27.0` builds `exodus` and `luci-app-exodus` 1.27.0, the Keenetic, MikroTik and Asuswrt-Merlin branches show the same numbers. `mihomo-meta` has the version of the Mihomo core it packages.
+Exodus has one version for all routers, the version of the [release](https://github.com/prettyleaf/openwrt-exodus/releases): the tag `v1.27.0` builds `exodus` and `luci-app-exodus` 1.27.0, the Keenetic, MikroTik and Asuswrt-Merlin branches show the same numbers.
 
 ## Migrating from Nikki
 
@@ -98,7 +98,7 @@ echo "src-git exodus https://github.com/prettyleaf/openwrt-exodus.git;main" >> "
 make package/luci-app-exodus/compile
 ```
 
-The package files will be found under `bin/packages/your_architecture/exodus`.
+The package files will be found under `bin/packages/your_architecture/exodus`. The packages carry no core: the installer downloads it, or compile `make package/mihomo-meta/compile` too, it puts the official Mihomo Meta binary into `/usr/libexec/mihomo`.
 
 ## Dependencies
 
@@ -112,7 +112,6 @@ The package files will be found under `bin/packages/your_architecture/exodus`.
 - kmod-nft-tproxy
 - kmod-tun
 - kmod-dummy
-- mihomo (`mihomo-meta`)
 
 ## Special Thanks
 

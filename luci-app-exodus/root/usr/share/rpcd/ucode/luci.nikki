@@ -8,9 +8,10 @@ import { get_users, get_groups, get_cgroups, load_profile } from '/etc/nikki/uco
 
 const repository = 'prettyleaf/openwrt-exodus';
 
-// alternative cores chosen in the installer, their releases publish the latest version in version.txt;
+// the cores the installer downloads, their releases publish the latest version in version.txt;
 // Prizrak-Kroha and its UPX build come with the releases of Prizrak-Core
 const core_releases = {
+	meta: 'https://github.com/MetaCubeX/mihomo/releases/latest/download',
 	alpha: 'https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha',
 	prizrak: 'https://github.com/legiz-ru/Prizrak-Core/releases/latest/download',
 	'prizrak-kroha': 'https://github.com/legiz-ru/Prizrak-Core/releases/latest/download',
@@ -87,7 +88,7 @@ const methods = {
 				}
 			}
 			let core = '';
-			process = popen('mihomo -v | grep Mihomo | cut -d " " -f 3');
+			process = popen('/usr/libexec/mihomo -v | grep Mihomo | cut -d " " -f 3');
 			if (process) {
 				core = trim(process.read('all'));
 				process.close();
@@ -234,7 +235,7 @@ const methods = {
 			const arch = release.arch;
 			const branch = release.branch;
 			const installed = {};
-			for (let name in ['exodus', 'luci-app-exodus', 'mihomo-meta', 'mihomo-alpha']) {
+			for (let name in ['exodus', 'luci-app-exodus']) {
 				installed[name] = package_version(name);
 			}
 			// the installer saves the chosen core and the gh-proxy it downloads through
@@ -278,9 +279,9 @@ const methods = {
 					}
 				}
 			}
-			// an alternative core replaces the binary of mihomo-meta, its version is read from the binary
+			// the core belongs to no package, its version is read from the binary
 			const core = { type: core_type, installed: null, latest: null };
-			let process = popen('mihomo -v 2>/dev/null | grep Mihomo | cut -d " " -f 3');
+			let process = popen('/usr/libexec/mihomo -v 2>/dev/null | grep Mihomo | cut -d " " -f 3');
 			if (process) {
 				core.installed = trim(process.read('all')) || null;
 				process.close();

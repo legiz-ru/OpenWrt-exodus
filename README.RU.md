@@ -21,7 +21,7 @@
 ## Возможности
 
 - Прозрачный прокси (Redirect/TPROXY/TUN, IPv4 и/или IPv6), по умолчанию TCP Redirect + UDP TPROXY
-- Официальное ядро Mihomo: `mihomo-meta` упаковывает готовый бинарник из [релизов MetaCubeX](https://github.com/MetaCubeX/mihomo/releases) с проверкой sha256
+- Ядро скачивает установщик из его релизов на GitHub под архитектуру роутера, пакетом оно не ставится: флеш занимает только выбранное ядро
 - Выбор ядра в установщике и на странице обновлений: [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core), стабильный Mihomo Meta, Mihomo Alpha или Prizrak-Kroha — облегчённая сборка Prizrak-Core для роутеров с малым флешем (amd64, arm64, armv7, mips и mipsle; `prizrak-kroha-upx` — та же сборка, сжатая UPX)
 - Установка, даже если GitHub не отвечает роутеру: через GitHub API, публичные зеркала `gh-proxy.com` и `ghfast.top` или свой [gh-proxy](https://github.com/prettyleaf/gh-proxy)
 - Выбор устройств для прокси: проксировать всех, кроме выбранных, или только выбранные устройства
@@ -50,7 +50,7 @@ wget -O - https://raw.githubusercontent.com/prettyleaf/openwrt-exodus/main/insta
 
 ### Версии
 
-У Exodus одна версия для всех роутеров — версия [релиза](https://github.com/prettyleaf/openwrt-exodus/releases): тег `v1.27.0` собирает `exodus` и `luci-app-exodus` 1.27.0, ветки Keenetic, MikroTik и Asuswrt-Merlin показывают те же номера. У `mihomo-meta` версия ядра Mihomo, которое он упаковывает.
+У Exodus одна версия для всех роутеров — версия [релиза](https://github.com/prettyleaf/openwrt-exodus/releases): тег `v1.27.0` собирает `exodus` и `luci-app-exodus` 1.27.0, ветки Keenetic, MikroTik и Asuswrt-Merlin показывают те же номера.
 
 ## Переход с Nikki
 
@@ -98,7 +98,7 @@ echo "src-git exodus https://github.com/prettyleaf/openwrt-exodus.git;main" >> "
 make package/luci-app-exodus/compile
 ```
 
-Пакеты появятся в `bin/packages/your_architecture/exodus`.
+Пакеты появятся в `bin/packages/your_architecture/exodus`. Ядра в пакетах нет: его скачивает установщик, или соберите ещё `make package/mihomo-meta/compile` — он кладёт официальный бинарник Mihomo Meta в `/usr/libexec/mihomo`.
 
 ## Зависимости
 
@@ -112,7 +112,6 @@ make package/luci-app-exodus/compile
 - kmod-nft-tproxy
 - kmod-tun
 - kmod-dummy
-- mihomo (`mihomo-meta`)
 
 ## Благодарности
 

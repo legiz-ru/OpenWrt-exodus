@@ -4,7 +4,7 @@
 # downloads packages for this router directly from GitHub releases and installs them locally
 # VERSION=<tag>   install a specific release instead of the latest one
 # LOW_SPACE=1     remove the current core before installing the new one, for routers with little free flash
-# CORE=<core>     install this core without asking: prizrak (Prizrak-Core), meta (stable, packaged), alpha (Mihomo Alpha),
+# CORE=<core>     install this core without asking: prizrak (Prizrak-Core), meta (stable Mihomo Meta), alpha (Mihomo Alpha),
 #                 prizrak-kroha (Prizrak-Kroha, the lighter router build of Prizrak-Core) or prizrak-kroha-upx (the same, packed with UPX)
 # GH_PROXY=<url>  download from GitHub through gh-proxy (https://github.com/prettyleaf/gh-proxy), e.g. https://example.com/ghproxy/TOKEN, empty to download directly
 # the core and GH_PROXY are saved in /etc/config/nikki, the next runs and the update page use them
@@ -176,7 +176,7 @@ core_title() {
 core_description() {
 	case "$1" in
 		prizrak) echo "mihomo fork by legiz-ru" ;;
-		meta) echo "latest stable release of MetaCubeX/mihomo, packaged with Exodus" ;;
+		meta) echo "latest stable release of MetaCubeX/mihomo" ;;
 		alpha) echo "development build of MetaCubeX/mihomo" ;;
 		prizrak-kroha) echo "lighter Prizrak-Core for routers, about 35-40 MB on flash" ;;
 		prizrak-kroha-upx) echo "Prizrak-Kroha packed with UPX: about 8-10 MB on flash, unpacked into RAM at start" ;;
@@ -194,7 +194,7 @@ core_menu() {
 	done
 }
 
-# replace the binary of mihomo-meta with a core build from github releases
+# write the core binary from github releases, it belongs to no package
 # $1 url of the gzipped binary
 install_core() {
 	local file="$temp_dir/core.gz"
@@ -305,7 +305,7 @@ case "$DISTRIB_RELEASE" in
 		;;
 esac
 
-# name of core builds for this architecture, the same variant as in mihomo-meta
+# name of core builds for this architecture, the same variant as in the mihomo-meta package of the feed
 case "$arch" in
 	aarch64_*) core_arch="arm64" ;;
 	arm_arm1176jzf-s_vfp) core_arch="armv6" ;;
@@ -452,7 +452,7 @@ else
 	info "directly${release_tag:+, release $release_tag}"
 fi
 
-# choose the core: meta is the mihomo-meta package, alpha, prizrak, prizrak-kroha and prizrak-kroha-upx replace its binary with a build from github releases
+# choose the core: the installer downloads it from its github releases, no package carries it
 # the current core is saved in the config, the alpha and prizrak-kroha cores installed by hand are detected by their versions
 step "Choosing the core"
 current_core=$(uci -q get nikki.update.core)
@@ -487,34 +487,34 @@ case "$core" in
 	*) fail "unknown core: $core, use prizrak, meta, alpha, prizrak-kroha or prizrak-kroha-upx" ;;
 esac
 
-# find the latest build of an alternative core before anything is changed, the releases publish its version in version.txt
-if [ "$core" != "meta" ]; then
-	[ -n "$core_arch" ] || fail "no $(core_title "$core") build for $arch"
-	case "$core" in
-		alpha)
-			core_release="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha"
-			core_asset="mihomo-linux-$core_arch"
-			;;
-		prizrak)
-			core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
-			core_asset="prizrak-core-linux-$core_arch"
-			;;
-		prizrak-kroha|prizrak-kroha-upx)
-			# Prizrak-Kroha is published in the releases of Prizrak-Core, the UPX build has -compressed before the version
-			[ -n "$kroha_arch" ] || fail "no $(core_title "$core") build for $arch, choose Prizrak-Core"
-			core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
-			core_asset="prizrak-kroha-linux-$kroha_arch"
-			[ "$core" = "prizrak-kroha-upx" ] && core_asset="$core_asset-compressed"
-			;;
-	esac
-	core_latest=$(download_github "$core_release/version.txt" - -q -T 15 2> /dev/null | head -n 1)
-	if ! echo "$core_latest" | grep -q -E '^[A-Za-z0-9._-]+$'; then
-		fail "failed to get the latest version of $(core_title "$core") from $core_release"
-	fi
-	info "$(core_title "$core") $core_latest"
-else
-	info "$(core_title "$core"), the mihomo-meta package of the release"
+# find the latest build of the core before anything is changed, the releases publish its version in version.txt
+[ -n "$core_arch" ] || fail "no $(core_title "$core") build for $arch"
+case "$core" in
+	meta)
+		core_release="https://github.com/MetaCubeX/mihomo/releases/latest/download"
+		core_asset="mihomo-linux-$core_arch"
+		;;
+	alpha)
+		core_release="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha"
+		core_asset="mihomo-linux-$core_arch"
+		;;
+	prizrak)
+		core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
+		core_asset="prizrak-core-linux-$core_arch"
+		;;
+	prizrak-kroha|prizrak-kroha-upx)
+		# Prizrak-Kroha is published in the releases of Prizrak-Core, the UPX build has -compressed before the version
+		[ -n "$kroha_arch" ] || fail "no $(core_title "$core") build for $arch, choose Prizrak-Core"
+		core_release="https://github.com/legiz-ru/Prizrak-Core/releases/latest/download"
+		core_asset="prizrak-kroha-linux-$kroha_arch"
+		[ "$core" = "prizrak-kroha-upx" ] && core_asset="$core_asset-compressed"
+		;;
+esac
+core_latest=$(download_github "$core_release/version.txt" - -q -T 15 2> /dev/null | head -n 1)
+if ! echo "$core_latest" | grep -q -E '^[A-Za-z0-9._-]+$'; then
+	fail "failed to get the latest version of $(core_title "$core") from $core_release"
 fi
+info "$(core_title "$core") $core_latest"
 
 # remove legacy upstream feed, otherwise the package manager may replace these packages with upstream ones
 step "Downloading Exodus${release_tag:+ $release_tag}"
@@ -534,23 +534,15 @@ if ! ls "$temp_dir"/exodus[_-][0-9]* > /dev/null 2>&1; then
 	fail "download failed, if the provider slows down GitHub, install through gh-proxy, see README"
 fi
 
-# an alternative core replaces the binary of mihomo-meta, the package stays only as a dependency and is not updated
-meta_version=$(package_version mihomo-meta)
-update_meta=1
-if [ "$core" != "meta" ] && [ -n "$meta_version" ]; then
-	update_meta=0
-fi
-
 # update feeds for dependencies, collect packages to install and legacy nikki packages to replace
 step "Installing packages"
 info "update feeds"
 if [ "$package_manager" = "opkg" ]; then
 	opkg update
 	languages=$(opkg list-installed 'luci-i18n-base-*' | cut -d ' ' -f 1 | cut -d '-' -f 4-)
-	packages="$(ls "$temp_dir"/exodus_*.ipk "$temp_dir"/luci-app-exodus_*.ipk 2>/dev/null)"
-	if [ "$update_meta" = 1 ]; then
-		packages="$(ls "$temp_dir"/mihomo-meta_*.ipk 2>/dev/null) $packages"
-	fi
+	# releases before 1.31.0 depend on mihomo-meta and carry it in the archive, the later ones have no package of the core
+	meta_package="$(ls "$temp_dir"/mihomo-meta_*.ipk 2>/dev/null)"
+	packages="$meta_package $(ls "$temp_dir"/exodus_*.ipk "$temp_dir"/luci-app-exodus_*.ipk 2>/dev/null)"
 	for lang in $languages; do
 		packages="$packages $(ls "$temp_dir"/luci-i18n-exodus-${lang}_*.ipk 2>/dev/null)"
 	done
@@ -558,10 +550,8 @@ if [ "$package_manager" = "opkg" ]; then
 elif [ "$package_manager" = "apk" ]; then
 	apk update
 	languages=$(apk list --installed --manifest 'luci-i18n-base-*' | cut -d ' ' -f 1 | cut -d '-' -f 4-)
-	packages="$(ls "$temp_dir"/exodus-[0-9]*.apk "$temp_dir"/luci-app-exodus-[0-9]*.apk 2>/dev/null)"
-	if [ "$update_meta" = 1 ]; then
-		packages="$(ls "$temp_dir"/mihomo-meta-[0-9]*.apk 2>/dev/null) $packages"
-	fi
+	meta_package="$(ls "$temp_dir"/mihomo-meta-[0-9]*.apk 2>/dev/null)"
+	packages="$meta_package $(ls "$temp_dir"/exodus-[0-9]*.apk "$temp_dir"/luci-app-exodus-[0-9]*.apk 2>/dev/null)"
 	for lang in $languages; do
 		packages="$packages $(ls "$temp_dir"/luci-i18n-exodus-${lang}-[0-9]*.apk 2>/dev/null)"
 	done
@@ -592,32 +582,13 @@ if [ -n "$legacy_packages" ]; then
 	fi
 fi
 
-# mihomo-alpha is no longer shipped and conflicts with mihomo-meta, replace it
+# mihomo-alpha is no longer shipped and conflicts with mihomo-meta of older releases, remove it, the core is installed below
 if [ "$package_manager" = "opkg" ] && opkg list-installed mihomo-alpha | grep -q "^mihomo-alpha"; then
-	info "replace mihomo-alpha with mihomo-meta"
+	info "remove mihomo-alpha"
 	opkg remove --force-depends mihomo-alpha
 elif [ "$package_manager" = "apk" ] && apk list -I mihomo-alpha 2>/dev/null | grep -q "^mihomo-alpha"; then
-	info "replace mihomo-alpha with mihomo-meta"
+	info "remove mihomo-alpha"
 	apk del mihomo-alpha
-fi
-
-# low space mode, the old and the new core may not fit together, so remove the old one if the core is updated
-if [ "$LOW_SPACE" = 1 ] && [ "$update_meta" = 1 ] && [ -f "/usr/libexec/mihomo" ]; then
-	core_file=$(ls "$temp_dir"/mihomo-meta[_-][0-9]* 2>/dev/null | head -n 1)
-	core_file=${core_file##*/}
-	if [ "$package_manager" = "opkg" ]; then
-		new_core_version=${core_file#mihomo-meta_}
-		new_core_version=${new_core_version%%_*}
-	elif [ "$package_manager" = "apk" ]; then
-		new_core_version=${core_file#mihomo-meta-}
-		new_core_version=${new_core_version%.apk}
-	fi
-	if [ -n "$new_core_version" ] && [ "$meta_version" != "$new_core_version" ]; then
-		warn "low space mode: remove current core $meta_version"
-		# the running core keeps its file allocated, stop it first
-		[ -x "/etc/init.d/nikki" ] && /etc/init.d/nikki stop
-		rm -f "/usr/libexec/mihomo"
-	fi
 fi
 
 # install packages
@@ -633,24 +604,30 @@ elif [ "$package_manager" = "apk" ]; then
 	apk add --allow-untrusted $packages || fail "install failed"
 fi
 
+# exodus no longer depends on mihomo-meta: the package is removed, its file is kept for the core step,
+# moved aside meanwhile, the package manager deletes the files of a package
+if [ -z "$meta_package" ] && [ -n "$(package_version mihomo-meta)" ]; then
+	info "remove the mihomo-meta package, the core is installed by the installer now"
+	[ -f "/usr/libexec/mihomo" ] && mv -f "/usr/libexec/mihomo" "/usr/libexec/mihomo.keep"
+	if [ "$package_manager" = "opkg" ]; then
+		opkg remove mihomo-meta
+	elif [ "$package_manager" = "apk" ]; then
+		apk del mihomo-meta
+	fi
+	[ -f "/usr/libexec/mihomo.keep" ] && mv -f "/usr/libexec/mihomo.keep" "/usr/libexec/mihomo"
+fi
+
 # install the chosen core, the packages are installed, free the ram for the core download
 rm -f "$temp_dir"/*.ipk "$temp_dir"/*.apk
 step "Installing the core"
-new_meta_version=$(package_version mihomo-meta)
-if [ "$core" = "meta" ]; then
-	# mihomo-meta writes its binary only when the package version changes, restore it after another core or a failed update
-	if [ "$new_meta_version" = "$meta_version" ] && { [ "$current_core" != "meta" ] || [ -z "$(core_binary_version /usr/libexec/mihomo)" ]; }; then
-		[ -n "$core_arch" ] || fail "no Mihomo Meta build for $arch"
-		meta_release=${new_meta_version%-r*}
-		install_core "https://github.com/MetaCubeX/mihomo/releases/download/v$meta_release/mihomo-linux-$core_arch-v$meta_release.gz"
-	else
-		info "$(core_title "$core") $(core_binary_version /usr/libexec/mihomo) of the mihomo-meta package"
-	fi
-elif [ "$current_core" != "$core" ] || [ "$new_meta_version" != "$meta_version" ] || [ "$(core_release_version /usr/libexec/mihomo)" != "$core_latest" ]; then
+# the binary tells its version, mihomo-meta of an older release may have replaced it
+if [ "$current_core" != "$core" ] || [ "$(core_release_version /usr/libexec/mihomo)" != "$core_latest" ]; then
 	install_core "$core_release/$core_asset-$core_latest.gz"
 else
 	info "$(core_title "$core") $core_latest is already installed"
 fi
+# mihomo in PATH, like the link of mihomo-meta: apk points it at busybox when that package goes, a file of another package stays
+[ -L "/usr/bin/mihomo" ] || [ ! -e "/usr/bin/mihomo" ] && ln -sf "/usr/libexec/mihomo" "/usr/bin/mihomo"
 
 # remember the core and the gh-proxy for the next runs and the update page
 uci -q set nikki.update=update

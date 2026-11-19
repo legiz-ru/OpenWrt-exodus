@@ -32,7 +32,7 @@ jobs:
         env:
           ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
           FEEDNAME: exodus
-          PACKAGES: mihomo-meta exodus luci-app-exodus
+          PACKAGES: exodus luci-app-exodus
           NO_REFRESH_CHECK: true
 
       - name: upload
