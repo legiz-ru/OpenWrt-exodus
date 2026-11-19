@@ -5,6 +5,16 @@
   },
   "releases": [
     {
+      "version": "1.31.0",
+      "date": "2026-11-19",
+      "en": [
+        "No changes on Keenetic: the release adds the Prizrak-Kroha core and the GitHub API route of the installer on OpenWrt."
+      ],
+      "ru": [
+        "На Keenetic без изменений: выпуск добавляет ядро Prizrak-Kroha и загрузку через GitHub API в установщик OpenWrt."
+      ]
+    },
+    {
       "version": "1.30.8",
       "date": "2026-11-18",
       "en": [
